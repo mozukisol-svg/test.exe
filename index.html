@@ -658,12 +658,15 @@
       init() {
         if (this.ctx) return;
         this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        if (this.ctx.state === 'suspended') this.ctx.resume();
         this.mG = this.ctx.createGain(); this.mG.connect(this.ctx.destination);
-        const f = [40, 44, 52];
-        f.forEach(hz => {
-          const o = this.ctx.createOscillator(); o.type = 'sine'; o.frequency.value = hz;
-          const g = this.ctx.createGain(); g.gain.value = 0.05;
-          o.connect(g); g.connect(this.mG); o.start(); this.nodes.push(o);
+        const f = [40, 44, 110, 112]; // Sub + Low Hum
+        f.forEach((hz, i) => {
+          const o = this.ctx.createOscillator(); o.type = i < 2 ? 'sine' : 'sawtooth';
+          o.frequency.value = hz;
+          const g = this.ctx.createGain(); g.gain.value = i < 2 ? 0.15 : 0.02;
+          const lpf = this.ctx.createBiquadFilter(); lpf.type = 'lowpass'; lpf.frequency.value = 200;
+          o.connect(lpf); lpf.connect(g); g.connect(this.mG); o.start(); this.nodes.push(o);
         });
         this.laugh();
       }
