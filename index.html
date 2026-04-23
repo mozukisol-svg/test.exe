@@ -8,7 +8,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#0a0a0a;--p:#111;--b:#1a1a1a;--b2:#252525;--g:#00ff41;--g2:#00aa2a;--g3:#005515;--r:#ff2040;--w:#d0d0c8;--d:#444;--d2:#222;--px:'Press Start 2P',monospace}
-html,body{width:100%;min-height:100vh;background:var(--bg);color:var(--w);font-family:var(--px);image-rendering:pixelated;overflow-x:hidden}
+html,body{width:100%;min-height:100vh;background:var(--bg);color:var(--w);font-family:var(--px);image-rendering:pixelated;overflow-x:hidden;cursor:crosshair}
 body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px)}
 @keyframes blink{50%{opacity:0}}
 @keyframes pulse{0%,100%{text-shadow:0 0 6px var(--g)}50%{text-shadow:0 0 18px var(--g),0 0 36px var(--g3)}}
@@ -56,7 +56,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;b
 /* Buttons */
 .acts{display:none;gap:6px;width:100%;flex-wrap:wrap}
 .acts.show{display:flex}
-.ab{flex:1;padding:10px 4px;font-family:var(--px);font-size:6px;letter-spacing:1px;border:2px solid;cursor:pointer;text-align:center;transition:all .06s;min-width:80px}
+.ab{flex:1;padding:10px 4px;font-family:var(--px);font-size:6px;letter-spacing:1px;border:2px solid;cursor:crosshair;text-align:center;transition:all .06s;min-width:80px}
 .ab:active{transform:translate(2px,3px);box-shadow:none!important}
 .ab-g{background:var(--g);color:#000;border-color:var(--g2);box-shadow:3px 3px 0 var(--g3)}
 .ab-g:hover{background:#30ff60;transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--g3)}
@@ -68,7 +68,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;b
 .ab-tw:hover{border-color:#1da1f2;transform:translate(-1px,-1px);box-shadow:4px 4px 0 #083860}
 
 /* Execute button */
-#execBtn{width:100%;padding:14px;font-family:var(--px);font-size:10px;letter-spacing:3px;background:var(--g);color:#000;border:3px solid var(--g2);box-shadow:4px 4px 0 var(--g3);cursor:pointer}
+#execBtn{width:100%;padding:14px;font-family:var(--px);font-size:10px;letter-spacing:3px;background:var(--g);color:#000;border:3px solid var(--g2);box-shadow:4px 4px 0 var(--g3);cursor:crosshair}
 #execBtn:hover{background:#30ff60;transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--g3)}
 #execBtn:active{transform:translate(3px,4px);box-shadow:none}
 
@@ -272,19 +272,13 @@ const TWEETS=[
 "WARNING: test.exe has been classified as anomalous.",
 "Someone sent me test.exe. Now I can't stop."
 ];
-const TAGS='\n\n#testexe #NFT #cursedNFT #pixelart #web3 #glitchart #horror';
+const TAGS='\n\nhttps://opensea.io/collection/test-exe-collection\n\n#testexe #NFT #cursedNFT #pixelart #web3 #glitchart #horror';
 function tweet(){
   if(!curT.Palette)return;
   setStatus('UPLOADING ENTITY...');
   cv.toBlob(function(blob){
     const file=new File([blob],'test_exe.jpg',{type:'image/jpeg'});
     const txt=rc(TWEETS)+TAGS;
-    // Try Web Share API first (mobile + some desktop - includes image)
-    if(navigator.canShare&&navigator.canShare({files:[file]})){
-      navigator.share({text:txt,files:[file]}).catch(()=>{});
-      setStatus('TRANSMISSION INITIATED');
-      return;
-    }
     // Upload to imgur so image appears in tweet
     const fd=new FormData();
     fd.append('image',blob);
@@ -307,6 +301,42 @@ function tweet(){
 }
 // Auto-generate on load
 generate();
+// Jumpscare sound on button clicks
+document.querySelectorAll('button').forEach(b => {
+  b.addEventListener('click', () => {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AudioContext();
+      
+      const bufferSize = ctx.sampleRate * 0.5; 
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * 3; 
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      
+      const osc = ctx.createOscillator();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(3000, ctx.currentTime + 0.1);
+      
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(4, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+      
+      noise.connect(gain);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      
+      noise.start();
+      osc.start();
+      noise.stop(ctx.currentTime + 0.5);
+      osc.stop(ctx.currentTime + 0.5);
+    } catch(e) {}
+  });
+});
 </script>
 </body>
 </html>
