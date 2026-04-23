@@ -1,0 +1,15 @@
+{
+  "name": "test.exe \u2014 UNREVEALED",
+  "description": "This entity has not yet materialized. The file is still corrupted. Wait for the system to finish processing all 5,000 entities.",
+  "image": "ipfs://bafkreidacanmwyf6jrdwtpdceclovcrbwkdhgebd46gygv24hcnnipqlxq",
+  "attributes": [
+    {
+      "trait_type": "Status",
+      "value": "CORRUPTED"
+    },
+    {
+      "trait_type": "Access Level",
+      "value": "RESTRICTED"
+    }
+  ]
+}

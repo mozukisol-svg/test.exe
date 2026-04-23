@@ -1,0 +1,11 @@
+.env
+node_modules/
+output/
+artifacts/
+cache/
+typechain-types/
+coverage/
+coverage.json
+__pycache__/
+*.pyc
+.DS_Store
