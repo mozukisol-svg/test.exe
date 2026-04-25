@@ -276,5 +276,8 @@ function claimReward(){
   stats.reward = 0;
   addLog('🏆 [REWARD] CLAIMED! '+entity.name+' is grateful. Reward has been reset.');
   updateUI();save();
+
+  const text = encodeURIComponent("I just claimed a reward from taking care of my Best Friend! 🏆\n\nTake care of your own entity at:\nhttps://opensea.io/collection/test-exe-collection/overview\n\n#testexe #NFT #cursedNFT #web3");
+  window.open('https://twitter.com/intent/tweet?text=' + text, '_blank');
 }
 window.claimReward = claimReward;
