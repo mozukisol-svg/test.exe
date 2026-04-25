@@ -160,15 +160,23 @@ function tweet(){if(!curT.Palette)return;window.open('https://twitter.com/intent
 
 generate();
 
-// ===== AUDIO =====
-class AudioManager{
-  constructor(){this.m=new Audio('https://archive.org/download/waving-ant-analog-horror/15%20-%20Nasty%20Drone%20Ambience.mp3');this.m.loop=true;this.m.volume=0.4;this.lS='https://archive.org/download/scary-horror-music/Don%27t%20go%20in%21%20%28v.1.2%29/Sound/Lachende.mp3';this.cS='https://archive.org/download/scary-horror-music/Don%27t%20go%20in%21%20%28v.1.2%29/Sound/Hit.mp3';this.isOn=true;this.initd=false}
-  init(){if(this.initd)return;this.m.play().catch(()=>{});this.initd=true;this.laughLoop()}
-  toggle(){this.isOn=!this.isOn;this.m.muted=!this.isOn;document.getElementById('musicToggle').textContent=`MUSIC: ${this.isOn?'ON':'OFF'}`}
-  click(){if(!this.isOn)return;const s=new Audio(this.cS);s.volume=0.3;s.play().catch(()=>{})}
-  laugh(){if(!this.isOn)return;const s=new Audio(this.lS);s.volume=0.5;s.play().catch(()=>{})}
-  laughLoop(){const play=()=>{setTimeout(()=>{if(this.initd)this.laugh();play()},20000+Math.random()*40000)};play()}
-}
-const AM=new AudioManager();
-function toggleMusic(){AM.toggle()}
-window.addEventListener('mousedown',()=>{AM.init();AM.click()});
+// ===== AUDIO — click only =====
+(function(){
+  let audioCtx;
+  function playClick(){
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(800, t);
+    osc.frequency.exponentialRampToValueAtTime(200, t + 0.05);
+    gain.gain.setValueAtTime(0.15, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+    osc.start(t); osc.stop(t + 0.08);
+  }
+  window.addEventListener('mousedown', e => {
+    playClick();
+  });
+})();
