@@ -14,6 +14,23 @@
   setTimeout(trigger,2000);
 })();
 
+// ===== CUSTOM CURSOR & PARTICLES =====
+(function(){
+  const dot=document.getElementById('cursorDot');if(!dot)return;
+  let mx=0,my=0,cx=0,cy=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+  function tick(){cx+=(mx-cx)*.35;cy+=(my-cy)*.35;dot.style.left=cx+'px';dot.style.top=cy+'px';requestAnimationFrame(tick)}
+  tick();
+})();
+(function(){
+  const container=document.getElementById('particleContainer');if(!container)return;
+  const colors=['#00ff41','#00cc33','#006622','#00ff80','#003311','#88ffaa'];
+  document.addEventListener('mousedown',e=>{
+    const count=6+Math.floor(Math.random()*4);
+    for(let i=0;i<count;i++){const p=document.createElement('div');p.className='click-particle';const sz=3+Math.floor(Math.random()*5);p.style.width=sz+'px';p.style.height=sz+'px';p.style.left=e.clientX+'px';p.style.top=e.clientY+'px';p.style.background=colors[Math.floor(Math.random()*colors.length)];container.appendChild(p);const vx=(Math.random()-.5)*12,vy0=-Math.random()*8-2;let x=0,y=0,vyC=vy0,op=1;function anim(){x+=vx;vyC+=.4;y+=vyC;op-=.025;if(op<=0){p.remove();return}p.style.transform=`translate(${x}px,${y}px)`;p.style.opacity=op;requestAnimationFrame(anim)}requestAnimationFrame(anim)}
+  });
+})();
+
 // ===== GENERATOR =====
 const S=32,SC=16,O=S*SC;
 const cv=document.getElementById('cv'),cx=cv.getContext('2d');
