@@ -4,692 +4,317 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-  <title>test.exe</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box
-    }
-
-    :root {
-      --bg: #0a0a0a;
-      --p: #111;
-      --b: #1a1a1a;
-      --b2: #252525;
-      --g: #00ff41;
-      --g2: #00aa2a;
-      --g3: #005515;
-      --r: #ff2040;
-      --w: #d0d0c8;
-      --d: #444;
-      --d2: #222;
-      --px: 'Press Start 2P', monospace
-    }
-
-    html,
-    body {
-      width: 100%;
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--w);
-      font-family: var(--px);
-      image-rendering: pixelated;
-      overflow-x: hidden;
-      cursor: crosshair
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 9999;
-      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, .06) 2px, rgba(0, 0, 0, .06) 4px)
-    }
-
-    @keyframes blink {
-      50% {
-        opacity: 0
-      }
-    }
-
-    @keyframes pulse {
-
-      0%,
-      100% {
-        text-shadow: 0 0 6px var(--g)
-      }
-
-      50% {
-        text-shadow: 0 0 18px var(--g), 0 0 36px var(--g3)
-      }
-    }
-
-    @keyframes scanmv {
-      0% {
-        top: -100%
-      }
-
-      100% {
-        top: 100%
-      }
-    }
-
-    @keyframes bob {
-
-      0%,
-      100% {
-        transform: translateY(0)
-      }
-
-      50% {
-        transform: translateY(-2px)
-      }
-    }
-
-    @keyframes flash {
-      0% {
-        opacity: 0
-      }
-
-      15% {
-        opacity: .4
-      }
-
-      100% {
-        opacity: 0
-      }
-    }
-
-    @keyframes trIn {
-      0% {
-        opacity: 0;
-        transform: translateX(-4px)
-      }
-
-      100% {
-        opacity: 1;
-        transform: translateX(0)
-      }
-    }
-
-    .view {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 12px 14px;
-      gap: 10px;
-      max-width: 420px;
-      margin: 0 auto
-    }
-
-    /* Top bar */
-    .bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      padding-bottom: 8px;
-      border-bottom: 2px solid var(--b2)
-    }
-
-    .bar-l {
-      display: flex;
-      align-items: center;
-      gap: 10px
-    }
-
-    .bar-title {
-      font-size: 8px;
-      color: var(--g);
-      letter-spacing: 3px;
-      animation: pulse 3s infinite
-    }
-
-    .bar-title .exe {
-      color: var(--r)
-    }
-
-    #pulls {
-      font-size: 5px;
-      color: var(--d);
-      letter-spacing: 1px
-    }
-
-    /* Canvas */
-    .cv-wrap {
-      position: relative;
-      background: #000;
-      border: 3px solid var(--b2);
-      overflow: hidden
-    }
-
-    .cv-wrap canvas {
-      display: block;
-      image-rendering: pixelated;
-      image-rendering: crisp-edges
-    }
-
-    .cv-scan {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: rgba(0, 255, 65, .08);
-      animation: scanmv 3s linear infinite;
-      pointer-events: none
-    }
-
-    .cv-glow {
-      position: absolute;
-      inset: 0;
-      box-shadow: inset 0 0 40px rgba(0, 255, 65, .06);
-      pointer-events: none
-    }
-
-    #flash {
-      position: fixed;
-      inset: 0;
-      background: #fff;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 800
-    }
-
-    #flash.pop {
-      animation: flash .6s ease forwards
-    }
-
-    /* Traits */
-    .traits {
-      display: none;
-      width: 100%;
-      background: var(--p);
-      border: 2px solid var(--b2);
-      padding: 4px 0
-    }
-
-    .traits.show {
-      display: block
-    }
-
-    .tr {
-      display: flex;
-      justify-content: space-between;
-      padding: 5px 10px;
-      border-bottom: 1px solid var(--d2);
-      font-size: 5px;
-      letter-spacing: .5px;
-      opacity: 0;
-      animation: trIn .25s ease forwards
-    }
-
-    .tr:last-child {
-      border-bottom: none
-    }
-
-    .tr-k {
-      color: var(--d)
-    }
-
-    .tr-v {
-      color: var(--w)
-    }
-
-    .tr-v.rare {
-      color: var(--r);
-      text-shadow: 0 0 6px var(--r)
-    }
-
-    /* Mood meter */
-    .mood {
-      display: none;
-      width: 100%;
-      background: var(--p);
-      border: 2px solid var(--b2);
-      padding: 10px 12px
-    }
-
-    .mood.show {
-      display: block
-    }
-
-    .mood-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px
-    }
-
-    .mood-lbl {
-      font-size: 5px;
-      color: var(--d);
-      letter-spacing: 1px
-    }
-
-    .mood-val {
-      font-size: 6px;
-      letter-spacing: 1px
-    }
-
-    .mood-bar {
-      width: 100%;
-      height: 8px;
-      background: var(--d2);
-      border: 1px solid var(--b2);
-      position: relative;
-      overflow: hidden
-    }
-
-    .mood-fill {
-      height: 100%;
-      transition: width .6s ease, background .6s ease
-    }
-
-    .mood-ticks {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 3px;
-      font-size: 4px;
-      color: var(--d);
-      letter-spacing: .5px
-    }
-
-    /* Buttons */
-    .acts {
-      display: none;
-      gap: 6px;
-      width: 100%;
-      flex-wrap: wrap
-    }
-
-    .acts.show {
-      display: flex
-    }
-
-    .ab {
-      flex: 1;
-      padding: 10px 4px;
-      font-family: var(--px);
-      font-size: 6px;
-      letter-spacing: 1px;
-      border: 2px solid;
-      cursor: crosshair;
-      text-align: center;
-      transition: all .06s;
-      min-width: 80px
-    }
-
-    .ab:active {
-      transform: translate(2px, 3px);
-      box-shadow: none !important
-    }
-
-    .ab-g {
-      background: var(--g);
-      color: #000;
-      border-color: var(--g2);
-      box-shadow: 3px 3px 0 var(--g3)
-    }
-
-    .ab-g:hover {
-      background: #30ff60;
-      transform: translate(-1px, -1px);
-      box-shadow: 4px 4px 0 var(--g3)
-    }
-
-    .ab-d {
-      background: transparent;
-      color: var(--w);
-      border-color: var(--b2);
-      box-shadow: 3px 3px 0 var(--d2)
-    }
-
-    .ab-d:hover {
-      border-color: var(--w);
-      transform: translate(-1px, -1px);
-      box-shadow: 4px 4px 0 var(--d2)
-    }
-
-    .ab-r {
-      background: transparent;
-      color: var(--r);
-      border-color: #601020;
-      box-shadow: 3px 3px 0 #400810
-    }
-
-    .ab-r:hover {
-      border-color: var(--r);
-      transform: translate(-1px, -1px);
-      box-shadow: 4px 4px 0 #400810
-    }
-
-    .ab-tw {
-      background: transparent;
-      color: #1da1f2;
-      border-color: #0d5f99;
-      box-shadow: 3px 3px 0 #083860
-    }
-
-    .ab-tw:hover {
-      border-color: #1da1f2;
-      transform: translate(-1px, -1px);
-      box-shadow: 4px 4px 0 #083860
-    }
-
-    /* Execute button */
-    #execBtn {
-      width: 100%;
-      padding: 14px;
-      font-family: var(--px);
-      font-size: 10px;
-      letter-spacing: 3px;
-      background: var(--g);
-      color: #000;
-      border: 3px solid var(--g2);
-      box-shadow: 4px 4px 0 var(--g3);
-      cursor: crosshair
-    }
-
-    #execBtn:hover {
-      background: #30ff60;
-      transform: translate(-1px, -1px);
-      box-shadow: 5px 5px 0 var(--g3)
-    }
-
-    #execBtn:active {
-      transform: translate(3px, 4px);
-      box-shadow: none
-    }
-
-    /* Status */
-    #status {
-      font-size: 5px;
-      color: var(--g3);
-      letter-spacing: 1px;
-      min-height: 10px;
-      text-align: center
-    }
-
-    .warn {
-      font-size: 4px;
-      color: var(--r);
-      letter-spacing: 2px;
-      animation: blink 1.2s step-end infinite;
-      text-align: center;
-      margin-top: 6px
-    }
-
-    footer {
-      font-size: 4px;
-      color: var(--d2);
-      letter-spacing: 2px;
-      text-align: center;
-      padding: 20px 0 12px
-    }
-  </style>
+  <title>test.exe — Unknown Origin</title>
+  <meta name="description"
+    content="test.exe — 5,000 unique pixel entities. Stored forever on Ethereum. Create your own Best Friend. Source: UNKNOWN.">
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
+
+  <!-- Custom Cursor -->
+  <div id="cursorDot"></div>
+  <div id="particleContainer"></div>
+
+  <!-- Static Background -->
+  <canvas id="staticBg"></canvas>
+  <!-- Glitch Overlay -->
+  <div id="glitchOverlay"></div>
+  <!-- Flash -->
   <div id="flash"></div>
-  <div class="view">
-    <div class="bar">
-      <div class="bar-l">
-        <div class="bar-title">test<span class="exe">.exe</span></div>
-        <button id="musicToggle" onclick="toggleMusic()" style="background:transparent;border:1px solid var(--d2);color:var(--d);font-size:5px;font-family:var(--px);cursor:crosshair;padding:2px 4px;margin-left:10px">MUSIC: ON</button>
-      </div>
-      <div id="pulls">ENTITIES: 0</div>
-    </div>
 
-    <div class="cv-wrap" id="cvWrap">
-      <canvas id="cv" width="512" height="512" style="width:min(90vw,360px);height:min(90vw,360px)"></canvas>
-      <div class="cv-scan"></div>
-      <div class="cv-glow"></div>
+  <!-- ===== NAVIGATION ===== -->
+  <nav class="nav">
+    <a href="#home" class="nav-logo">test<span class="exe">.exe</span></a>
+    <div class="nav-links">
+      <a href="#home">HOME</a>
+      <a href="#sneaks">CARE HANDLER</a>
+      <a href="#minigame">MINIGAME</a>
+      <a href="#mint">MINT</a>
+      <a href="#milestone">MILESTONE</a>
+      <a href="#tokenomics">TOKENOMICS</a>
+      <a href="generator.html" class="nav-cta">▶ CREATE YOURS</a>
     </div>
+  </nav>
 
-    <div id="status"></div>
-    <button id="execBtn" onclick="generate()">&#9654; EXECUTE<span style="animation:blink .8s step-end infinite">
-        |</span></button>
-
-    <div class="traits" id="traits"></div>
-    <div class="mood" id="mood">
-      <div class="mood-head">
-        <span class="mood-lbl">MOOD ANALYSIS</span>
-        <span class="mood-val" id="moodVal"></span>
-      </div>
-      <div class="mood-bar">
-        <div class="mood-fill" id="moodFill"></div>
-      </div>
-      <div class="mood-ticks"><span>RAGE</span><span>ANGRY</span><span>UNEASY</span><span>CALM</span><span>HAPPY</span>
-      </div>
+  <!-- ===== MARQUEE ===== -->
+  <div class="marquee">
+    <div class="marquee-inner">
+      <span>⚠ FILE ORIGIN UNKNOWN ⚠</span>
+      <span>DO NOT DISTRIBUTE</span>
+      <span>test.exe</span>
+      <span>ENTITY DETECTED</span>
+      <span>SCANNING...</span>
+      <span>BEST FRIENDS PROTOCOL INITIALIZED</span>
+      <span>⚠ FILE ORIGIN UNKNOWN ⚠</span>
+      <span>DO NOT DISTRIBUTE</span>
+      <span>test.exe</span>
+      <span>ENTITY DETECTED</span>
+      <span>SCANNING...</span>
+      <span>BEST FRIENDS PROTOCOL INITIALIZED</span>
     </div>
-    <div class="acts" id="acts">
-      <button class="ab ab-r" onclick="download()">EXTRACT</button>
-      <button class="ab ab-tw" onclick="tweet()">TRANSMIT</button>
-      <button class="ab ab-d" onclick="window.open('https://opensea.io/collection/test-exe-collection', '_blank')">[REDACTED]</button>
-    </div>
-
-    <div class="warn">&#9888; FILE ORIGIN UNKNOWN &#9888;</div>
-    <footer>test.exe &mdash; source: UNKNOWN &mdash; do not distribute</footer>
   </div>
 
-  <script>
-    const S = 32, SC = 16, O = S * SC;
-    const cv = document.getElementById('cv'); const cx = cv.getContext('2d');
-    const PALS = {
-      Cosmic: { bg: [18, 10, 40], skin: [180, 100, 220], outline: [0, 0, 0], hair: [0, 220, 255], eyes: [255, 50, 180], clothing: [60, 20, 100], accent: [255, 200, 50] },
-      Forest: { bg: [20, 40, 20], skin: [210, 175, 120], outline: [0, 0, 0], hair: [80, 40, 10], eyes: [50, 200, 80], clothing: [30, 80, 30], accent: [200, 160, 40] },
-      Lava: { bg: [40, 10, 0], skin: [255, 180, 100], outline: [0, 0, 0], hair: [200, 50, 0], eyes: [255, 220, 0], clothing: [180, 30, 0], accent: [255, 120, 0] },
-      Ocean: { bg: [5, 20, 50], skin: [150, 220, 240], outline: [0, 0, 0], hair: [0, 80, 180], eyes: [0, 200, 255], clothing: [10, 60, 120], accent: [200, 240, 255] },
-      Void: { bg: [10, 10, 10], skin: [200, 200, 200], outline: [50, 50, 50], hair: [150, 150, 150], eyes: [255, 255, 255], clothing: [60, 60, 60], accent: [180, 180, 180] },
-      Toxic: { bg: [10, 50, 0], skin: [100, 255, 50], outline: [0, 0, 0], hair: [180, 0, 255], eyes: [255, 255, 0], clothing: [0, 150, 0], accent: [0, 255, 100] },
-      Cyberpunk: { bg: [15, 15, 30], skin: [200, 180, 255], outline: [0, 0, 0], hair: [0, 255, 180], eyes: [255, 0, 100], clothing: [50, 0, 100], accent: [0, 200, 255] },
-      Glitch: { bg: [0, 0, 0], skin: [0, 255, 80], outline: [0, 0, 0], hair: [255, 0, 180], eyes: [255, 255, 0], clothing: [0, 100, 0], accent: [255, 0, 80] },
-      Ghost: { bg: [5, 5, 20], skin: [180, 200, 230], outline: [20, 20, 60], hair: [100, 120, 180], eyes: [200, 220, 255], clothing: [40, 50, 80], accent: [150, 180, 255] },
-      Terminal: { bg: [0, 10, 0], skin: [0, 180, 0], outline: [0, 0, 0], hair: [0, 255, 0], eyes: [0, 255, 100], clothing: [0, 80, 0], accent: [0, 255, 50] },
-      Static: { bg: [15, 15, 15], skin: [160, 160, 160], outline: [0, 0, 0], hair: [80, 80, 80], eyes: [220, 220, 220], clothing: [50, 50, 50], accent: [200, 200, 200] },
-      Corrupted: { bg: [10, 0, 0], skin: [180, 60, 60], outline: [0, 0, 0], hair: [100, 0, 40], eyes: [255, 40, 40], clothing: [60, 0, 0], accent: [200, 0, 100] },
-    };
-    const MONO = { bg: [10, 10, 10], skin: [200, 200, 200], outline: [0, 0, 0], hair: [150, 150, 150], eyes: [255, 255, 255], clothing: [80, 80, 80], accent: [180, 180, 180] };
-    const pn = Object.keys(PALS);
-    let rs = Date.now();
-    function rng() { rs ^= rs << 13; rs ^= rs >> 17; rs ^= rs << 5; return (rs >>> 0) / 4294967296 }
-    function ri(a, b) { return a + Math.floor(rng() * (b - a)) }
-    function rc(a) { return a[Math.floor(rng() * a.length)] }
-    const img = new Uint8Array(S * S * 3);
-    function px(x, y, c) { if (x >= 0 && x < S && y >= 0 && y < S) { const i = (y * S + x) * 3; img[i] = c[0]; img[i + 1] = c[1]; img[i + 2] = c[2] } }
-    function rect(x1, y1, x2, y2, c, o) { for (let y = y1; y <= y2; y++)for (let x = x1; x <= x2; x++)px(x, y, c); if (o) { for (let x = x1; x <= x2; x++) { px(x, y1, o); px(x, y2, o) } for (let y = y1; y <= y2; y++) { px(x1, y, o); px(x2, y, o) } } }
-    function hl(y, x1, x2, c) { for (let x = x1; x <= x2; x++)px(x, y, c) }
-    function vl(x, y1, y2, c) { for (let y = y1; y <= y2; y++)px(x, y, c) }
-    function ov(a, b, rx, ry, c, o) { for (let y = 0; y < S; y++)for (let x = 0; x < S; x++) { const d = ((x - a) / rx) ** 2 + ((y - b) / ry) ** 2; if (d <= 1) px(x, y, c) }; if (o) for (let y = 0; y < S; y++)for (let x = 0; x < S; x++) { const d = ((x - a) / rx) ** 2 + ((y - b) / ry) ** 2; if (d >= .85 && d <= 1.15) px(x, y, o) } }
-    let pulls = 0, curT = {};
-    function setStatus(t) { document.getElementById('status').textContent = t }
-    function generate() {
-      rs = Date.now() ^ (Math.random() * 0xFFFFFFFF >>> 0); img.fill(0);
-      const fl = document.getElementById('flash'); fl.className = ''; void fl.offsetWidth; fl.className = 'pop';
-      setStatus('SCANNING...');
-      const mono = rng() < 0.001; let pName = rc(pn); let p = mono ? { ...MONO } : { ...PALS[pName] }; if (mono) pName = 'Monochrome';
-      // bg
-      const bt = ri(0, 5); for (let y = 0; y < S; y++)for (let x = 0; x < S; x++)px(x, y, p.bg);
-      if (bt === 1) for (let y = 0; y < S; y++) { const f = y / (S - 1); hl(y, 0, S - 1, p.bg.map((v, i) => Math.floor(v * (1 - f) + p.accent[i] * f * .4))) }
-      if (bt === 2) for (let y = 0; y < S; y += 3)for (let x = 0; x < S; x += 3)px(x, y, p.bg.map(v => Math.min(255, v + 30)));
-      if (bt === 3) for (let y = 0; y < S; y++)hl(y, 0, S - 1, y % 4 < 2 ? p.bg : p.bg.map(v => Math.max(0, v - 20)));
-      const bgN = ['Solid', 'Gradient', 'Dots', 'Stripes', 'Vignette'][bt];
-      // skin
-      let skN = 'Normal'; const sp = { Gold: [255, 215, 0], Alien: [80, 255, 120], Undead: [160, 200, 140] };
-      if (rng() < .05) { const sk = rc(Object.keys(sp)); skN = sk; p.skin = sp[sk] }
-      // head
-      const cx2 = S / 2 + ri(-2, 3), hy = ri(9, 14), hw = ri(10, 14), hh = ri(10, 14);
-      ov(cx2, hy + Math.floor(hh / 2), Math.floor(hw / 2), Math.floor(hh / 2), p.skin, p.outline);
-      // hair
-      const hx = cx2 - Math.floor(hw / 2), hs = ['Short', 'Long', 'Spiky', 'Mohawk', 'Cap', 'Buns'], hi2 = ri(0, 6);
-      if (hi2 === 0) rect(hx, hy - 3, hx + hw - 1, hy, p.hair, p.outline);
-      else if (hi2 === 1) { rect(hx, hy - 4, hx + hw - 1, hy, p.hair, p.outline); vl(hx - 1, hy, hy + 6, p.hair); vl(hx + hw, hy, hy + 6, p.hair) }
-      else if (hi2 === 2) { for (let i = 0; i < ri(3, 6); i++) { const sx = hx + i * Math.floor(hw / 4) + 2; for (let dy = 0; dy < ri(3, 7); dy++)px(sx, hy - dy, p.hair) } rect(hx, hy - 1, hx + hw - 1, hy, p.hair) }
-      else if (hi2 === 3) { const mx = hx + Math.floor(hw / 2); for (let dy = 0; dy < ri(4, 8); dy++)for (let dx = -1; dx <= 1; dx++)px(mx + dx, hy - dy, p.accent) }
-      else if (hi2 === 4) { rect(hx - 1, hy - 4, hx + hw, hy, p.clothing, p.outline); hl(hy, hx - 3, hx + hw + 2, p.clothing) }
-      else { ov(hx + 2, hy - 2, 3, 3, p.hair, p.outline); ov(hx + hw - 3, hy - 2, 3, 3, p.hair, p.outline) }
-      // eyes
-      const ey = hy + Math.floor(hh / 3), elx = cx2 - Math.floor(hw / 4) - 1, erx = cx2 + Math.floor(hw / 4) - 1;
-      const es = ['Normal', 'Wide', 'Angry', 'X', 'Star', 'Closed'], ei = ri(0, 6);
-      if (ei === 0) for (let ex of [elx, erx]) { rect(ex, ey, ex + 1, ey + 1, p.eyes); px(ex, ey, p.outline) }
-      else if (ei === 1) for (let ex of [elx, erx]) rect(ex - 1, ey - 1, ex + 2, ey + 2, p.eyes, p.outline);
-      else if (ei === 2) for (let ex of [elx, erx]) { rect(ex, ey, ex + 1, ey + 1, p.eyes); hl(ey - 1, ex, ex + 1, p.outline) }
-      else if (ei === 3) for (let ex of [elx, erx]) { px(ex, ey, p.outline); px(ex + 1, ey + 1, p.outline); px(ex + 1, ey, p.outline); px(ex, ey + 1, p.outline) }
-      else if (ei === 4) for (let ex of [elx, erx]) { px(ex, ey, p.accent); px(ex + 1, ey, p.accent) }
-      else for (let ex of [elx, erx]) hl(ey, ex, ex + 1, p.outline);
-      px(cx2, hy + Math.floor(hh * 2 / 3) - 1, p.outline);
-      // mouth
-      const my = hy + hh - 3, mw = Math.floor(hw / 3), mx = cx2 - Math.floor(mw / 2);
-      const ms = ['Smile', 'Frown', 'Open', 'Teeth', 'Line'], mi = ri(0, 5);
-      if (mi === 0) { hl(my, mx, mx + mw, p.outline); px(mx - 1, my - 1, p.outline); px(mx + mw + 1, my - 1, p.outline) }
-      else if (mi === 1) { hl(my, mx, mx + mw, p.outline); px(mx - 1, my + 1, p.outline); px(mx + mw + 1, my + 1, p.outline) }
-      else if (mi === 2) rect(mx, my - 1, mx + mw, my + 1, p.accent, p.outline);
-      else if (mi === 3) { rect(mx, my, mx + mw, my + 1, [240, 240, 240], p.outline); for (let tx = mx; tx < mx + mw; tx += 2)vl(tx + 1, my, my + 1, p.outline) }
-      else hl(my, mx, mx + mw, p.outline);
-      // body
-      const ny = hy + hh + 1, nw = Math.floor(hw / 4); rect(cx2 - nw, ny, cx2 + nw, ny + 2, p.skin, p.outline);
-      const cs = ['T-Shirt', 'Suit', 'Hoodie', 'Jacket', 'Robe'], ci = ri(0, 5);
-      rect(cx2 - 7, ny + 2, cx2 + 7, S - 1, p.clothing, p.outline);
-      if (ci === 1) { rect(cx2 - 2, ny + 2, cx2 + 2, ny + 6, [240, 240, 240]); px(cx2, ny + 3, p.accent) }
-      else if (ci === 2) rect(cx2 - 3, ny + 2, cx2 + 3, ny + 5, p.hair);
-      else if (ci === 3) { rect(cx2 - 7, ny + 2, cx2 - 4, S - 1, p.accent, p.outline); rect(cx2 + 4, ny + 2, cx2 + 7, S - 1, p.accent, p.outline) }
-      // accessory
-      const as2 = ['None', 'Glasses', 'Scar', 'Tears'], ai = ri(0, 4);
-      if (ai === 1) for (let ex of [cx2 - 4, cx2 + 2]) { rect(ex, ey - 1, ex + 3, ey + 2, null, p.accent); hl(ey, cx2 - 1, cx2 + 1, p.accent) }
-      else if (ai === 2) vl(cx2 + 3, ey, ey + 3, p.accent);
-      else if (ai === 3) { px(cx2 - 3, ey + 2, [100, 180, 255]); px(cx2 - 3, ey + 3, [100, 180, 255]) }
-      // skull
-      const ep = new Set(['Glitch', 'Corrupted', 'Ghost', 'Terminal', 'Static']);
-      const skull = (rng() < .18) || (ep.has(pName) && rng() < .45);
-      let eyN = es[ei], moN = ms[mi], face = 'Human';
-      if (skull) {
-        const ol = p.outline, eY = hy + Math.floor(hh / 3), ox = Math.floor(hw / 4);
-        for (let ex of [cx2 - ox, cx2 + ox]) ov(ex, eY, 3, 3, [0, 0, 0]);
-        const mY = hy + hh - 3; hl(mY, cx2 - Math.floor(hw / 3), cx2 + Math.floor(hw / 3), ol);
-        hl(mY + 1, cx2 - Math.floor(hw / 3), cx2 + Math.floor(hw / 3), ol);
-        for (let tx = cx2 - Math.floor(hw / 3) + 1; tx < cx2 + Math.floor(hw / 3) - 1; tx += 3)vl(tx, mY, mY + 1, [200, 200, 200]);
-        eyN = 'Hollow'; moN = 'Skull Grin'; face = 'Skull';
-      }
-      // render 512
-      const id = cx.createImageData(O, O);
-      for (let y = 0; y < S; y++)for (let x = 0; x < S; x++) {
-        const si = (y * S + x) * 3, r = img[si], g = img[si + 1], b = img[si + 2];
-        for (let dy = 0; dy < SC; dy++)for (let dx = 0; dx < SC; dx++) { const di = ((y * SC + dy) * O + (x * SC + dx)) * 4; id.data[di] = r; id.data[di + 1] = g; id.data[di + 2] = b; id.data[di + 3] = 255 }
-      }
-      // voxel shade
-      for (let by = 0; by < O; by += SC)for (let bx = 0; bx < O; bx += SC) {
-        const c2 = ((by + SC / 2) * O + (bx + SC / 2)) * 4; const br = id.data[c2], bg2 = id.data[c2 + 1], bb = id.data[c2 + 2];
-        if (br + bg2 + bb < 40) continue;
-        for (let dy = 0; dy < 2; dy++)for (let dx = 0; dx < SC; dx++) { const i = ((by + dy) * O + (bx + dx)) * 4; id.data[i] = Math.min(255, br * 1.4); id.data[i + 1] = Math.min(255, bg2 * 1.4); id.data[i + 2] = Math.min(255, bb * 1.4) }
-        for (let dy = 0; dy < SC; dy++)for (let dx = 0; dx < 2; dx++) { const i = ((by + dy) * O + (bx + dx)) * 4; id.data[i] = Math.min(255, br * 1.4); id.data[i + 1] = Math.min(255, bg2 * 1.4); id.data[i + 2] = Math.min(255, bb * 1.4) }
-        for (let dy = SC - 3; dy < SC; dy++)for (let dx = 0; dx < SC; dx++) { const i = ((by + dy) * O + (bx + dx)) * 4; id.data[i] = br * .5; id.data[i + 1] = bg2 * .5; id.data[i + 2] = bb * .5 }
-        for (let dy = 0; dy < SC; dy++)for (let dx = SC - 3; dx < SC; dx++) { const i = ((by + dy) * O + (bx + dx)) * 4; id.data[i] = br * .5; id.data[i + 1] = bg2 * .5; id.data[i + 2] = bb * .5 }
-      }
-      if (mono) for (let i = 0; i < id.data.length; i += 4) { const g = Math.min(255, Math.max(0, ((id.data[i] + id.data[i + 1] + id.data[i + 2]) / 3 - 50) * 1.6)); id.data[i] = id.data[i + 1] = id.data[i + 2] = g }
-      cx.putImageData(id, 0, 0);
-      // traits
-      curT = { Palette: pName, Background: bgN, Face: face, Skin: skN, Hair: hs[hi2], Eyes: eyN, Mouth: moN, Clothing: cs[ci], Accessory: as2[ai] };
-      const td = document.getElementById('traits');
-      td.innerHTML = Object.entries(curT).map(([k, v], i) => `<div class="tr" style="animation-delay:${i * .06}s"><span class="tr-k">${k}</span><span class="tr-v${mono ? ' rare' : ''}">${v}</span></div>`).join('');
-      if (mono) td.innerHTML += `<div class="tr" style="animation-delay:.6s"><span class="tr-k">RARITY</span><span class="tr-v rare">&#9888; ULTRA RARE</span></div>`;
-      td.classList.add('show');
-      // Mood meter
-      const moodScores = {
-        Eyes: { Normal: 60, Wide: 70, Angry: 10, X: 5, Star: 80, Closed: 40, Hollow: 0 },
-        Mouth: { Smile: 90, Frown: 15, Open: 50, Teeth: 25, Line: 45, 'Skull Grin': 5 },
-        Face: { Human: 60, Skull: 8 }, Skin: { Normal: 55, Gold: 75, Alien: 40, Undead: 15 },
-        Palette: { Cosmic: 65, Forest: 70, Lava: 30, Ocean: 72, Void: 20, Toxic: 25, Cyberpunk: 55, Glitch: 15, Ghost: 18, Terminal: 35, Static: 28, Corrupted: 8, Monochrome: 12 }
-      };
-      let moodPts = 0, moodN = 0;
-      for (const [cat, val] of Object.entries(curT)) {
-        if (moodScores[cat] && moodScores[cat][val] != null) { moodPts += moodScores[cat][val]; moodN++ }
-      }
-      const moodPct = moodN ? Math.round(moodPts / moodN) : 50;
-      const moods = [[0, 'ENRAGED', '#ff1020'], [15, 'FURIOUS', '#ff3020'], [30, 'ANGRY', '#ff6030'], [45, 'UNEASY', '#ff9040'], [55, 'NEUTRAL', '#ccaa30'], [65, 'CALM', '#80cc30'], [75, 'CONTENT', '#50dd40'], [85, 'HAPPY', '#30ee50'], [95, 'EUPHORIC', '#00ff80']];
-      let moodLabel = 'NEUTRAL', moodColor = '#ccaa30';
-      for (const [thresh, lbl, col] of moods) { if (moodPct >= thresh) { moodLabel = lbl; moodColor = col } }
-      const moodEmojis = { ENRAGED: '&#128544;', FURIOUS: '&#128545;', ANGRY: '&#128548;', UNEASY: '&#128528;', NEUTRAL: '&#128566;', CALM: '&#128522;', CONTENT: '&#128578;', HAPPY: '&#128512;', EUPHORIC: '&#129321;' };
-      document.getElementById('moodVal').innerHTML = (moodEmojis[moodLabel] || '') + ' ' + moodLabel;
-      document.getElementById('moodVal').style.color = moodColor;
-      document.getElementById('moodFill').style.width = moodPct + '%';
-      document.getElementById('moodFill').style.background = moodColor;
-      document.getElementById('mood').classList.add('show');
-      curT.Mood = moodLabel;
-      document.getElementById('acts').classList.add('show');
-      pulls++; document.getElementById('pulls').textContent = 'ENTITIES: ' + pulls;
-      setTimeout(() => setStatus('ENTITY #' + pulls + ' MATERIALIZED // 0x' + Math.floor(rng() * 0xFFFFFF).toString(16).padStart(6, '0')), 200);
-    }
-    function download() {
-      if (!curT.Palette) return;
-      const a = document.createElement('a'); a.href = cv.toDataURL('image/jpeg', .95);
-      a.download = 'test_exe_' + Date.now() + '.jpg'; a.click();
-      setStatus('EXTRACTED TO LOCAL FILESYSTEM');
-    }
-    const TWEETS = [
-      "I found test.exe on my desktop. I don't remember downloading it.",
-      "Don't open test.exe. It's too late for me.",
-      "Will you be my Best Friend?",
-      "Every time I close test.exe it creates a new entity.",
-      "I ran test.exe once. Now my screen glitches at 3AM.",
-      "test.exe generated something that looks exactly like me. Except the eyes.",
-      "If you see test.exe in your downloads folder, it's already running.",
-      "The entities from test.exe aren't generated. They were always there.",
-      "WARNING: test.exe has been classified as anomalous.",
-      "Someone sent me test.exe. Now I can't stop."
-    ];
-    const TAGS = '\n\nhttps://opensea.io/collection/test-exe-collection\n\n#testexe #NFT #cursedNFT #pixelart #web3 #glitchart #horror';
-    function tweet() {
-      if (!curT.Palette) return;
-      const txt = rc(TWEETS) + TAGS;
-      window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(txt), '_blank');
-      setStatus('TRANSMISSION INITIATED');
-    }
-    // Auto-generate on load
-    generate();
-    // Audio System
-    class AudioManager {
-      constructor() {
-        this.m = new Audio('https://archive.org/download/waving-ant-analog-horror/15%20-%20Nasty%20Drone%20Ambience.mp3');
-        this.m.loop = true; this.m.volume = 0.4;
-        this.lS = 'https://archive.org/download/scary-horror-music/Don%27t%20go%20in%21%20%28v.1.2%29/Sound/Lachende.mp3';
-        this.cS = 'https://archive.org/download/scary-horror-music/Don%27t%20go%20in%21%20%28v.1.2%29/Sound/Hit.mp3';
-        this.isOn = true; this.initd = false;
-      }
-      init() {
-        if (this.initd) return;
-        this.m.play().catch(() => {});
-        this.initd = true;
-        this.laughLoop();
-      }
-      toggle() {
-        this.isOn = !this.isOn;
-        this.m.muted = !this.isOn;
-        document.getElementById('musicToggle').textContent = `MUSIC: ${this.isOn ? 'ON' : 'OFF'}`;
-      }
-      click() {
-        const s = new Audio(this.cS); s.volume = 0.3; s.play();
-      }
-      laugh() {
-        const s = new Audio(this.lS); s.volume = 0.5; s.play();
-      }
-      laughLoop() {
-        const play = () => {
-          setTimeout(() => { if(this.initd) this.laugh(); play(); }, 20000 + Math.random() * 40000);
-        };
-        play();
-      }
-    }
-    const AM = new AudioManager();
-    function toggleMusic() { AM.toggle(); }
+  <!-- ===== HERO ===== -->
+  <section id="home" class="section">
+    <div class="hero-grid">
+      <div class="hero-left">
+        <div class="section-label">// SYSTEM BOOT v2.0</div>
+        <h1 class="hero-title">EVERY ENTITY<br>HAS A<br><span class="dim">BEST FRIEND.</span></h1>
+        <p class="hero-desc">5,000 unique pixel entities. Stored forever on Ethereum. No IPFS. Unknown origin. Infinite
+          possibilities.</p>
+        <div class="hero-btns">
+          <a href="generator.html" class="btn-primary">▶ CREATE YOUR OWN</a>
+          <a href="https://x.com/mijajake" target="_blank" class="btn-outline">NOTIFY ME</a>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-preview">
+          <canvas id="heroCanvas" width="512" height="512"></canvas>
+          <div class="cv-scan"></div>
+          <div class="cv-glow"></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    window.addEventListener('mousedown', () => { AM.init(); AM.click(); });
+  <hr class="divider">
 
-    // Existing functions...
-  </script>
+  <!-- ===== MILESTONE ===== -->
+  <section id="milestone" class="section">
+    <div class="section-label">// PROTOCOL ROADMAP</div>
+    <h2 class="section-title">[MILESTONE]</h2>
+    <div class="section-sub">Each [MILESTONE] will be used to reward holders such as NFT giveaways, [TOKEN] airdrop and
+      lastly the [COMMUNITY CHEST]</div>
+
+    <div class="content-block" style="margin-bottom:30px">
+      <p>Do note: Each Milestone must meet a certain ETH volume and Month in order to take effect.</p>
+    </div>
+
+    <div class="milestone-grid">
+      <div class="milestone-card">
+        <h4>FIRST MILESTONE</h4>
+        <div class="ms-range">[after mint]</div>
+        <ul>
+          <li>Socials Created.</li>
+          <li>Community Chest created but locked.</li>
+          <li>Rewards for early holders, founders and community that helped.</li>
+          <li>NFT Sweeps.</li>
+          <li>Website Update.</li>
+        </ul>
+      </div>
+      <div class="milestone-card">
+        <h4>SECOND MILESTONE</h4>
+        <div class="ms-range">[25ETH at low 100ETH at high]</div>
+        <ul>
+          <li>Take effect in Early June or Late May.</li>
+          <li>[TOKENOMICS] will be Implemented.</li>
+          <li>Staking and [BEST FRIENDS] "Care Handler" will be Implemented.</li>
+          <li>Transactions on Website will mainly use [TOKENS] except gas fee.</li>
+        </ul>
+      </div>
+      <div class="milestone-card">
+        <h4>THIRD MILESTONE</h4>
+        <div class="ms-range">[50ETH at low 300ETH at high]</div>
+        <ul>
+          <li>Take effect at Early December or Late October.</li>
+          <li>[COMMUNITY REWARDS] will be upgraded.</li>
+          <li>[MISSIONS] will be implemented.</li>
+          <li>[LEADERPOINTS] will be integrated in order to reward seasonal holders.</li>
+        </ul>
+      </div>
+      <div class="milestone-card">
+        <h4>FOURTH MILESTONE</h4>
+        <div class="ms-range">[100ETH at low or 900ETH at high]</div>
+        <ul>
+          <li>Take effect at Q1 next year.</li>
+          <li>[COMMUNITY CHEST] will be unlocked.</li>
+          <li>[EVOLVABLE BEST FRIENDS] take effect.</li>
+          <li>[COMMUNITY TRAITS] will be integrated.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== ECONOMIC STRUCTURE ===== -->
+  <section id="economics" class="section">
+    <div class="section-label">// FUND ALLOCATION</div>
+    <h2 class="section-title">[ECONOMIC STRUCTURE]</h2>
+    <div class="section-sub">95% of all ETH Revenue will be used to Reward holders and Sweep NFTs while the remaining 5%
+      will be used to buy Amenities such as X blue check mark, Server and Domain Subscription and Team Allocation.</div>
+
+    <div class="content-block">
+      <h3>[FUND DISTRIBUTION] per [MILESTONE]</h3>
+
+      <div class="sub-title">FIRST MILESTONE</div>
+      <ul>
+        <li>25% Revenue will be shared to Other NFT Founder and Collaborated Communities that helped mint.</li>
+        <li>50% Revenue will be used to Sweep the Floor.</li>
+        <li>5% Revenue will be used for [COMMUNITY CHEST]</li>
+        <li>20% Revenue will be used to buy Amenities and Team Allocation.</li>
+      </ul>
+
+      <div class="sub-title">SECOND MILESTONE</div>
+      <ul>
+        <li>75% Revenue will be used to create the [TOKEN] and buy a large portion for it for [REWARD SYSTEM].</li>
+        <li>20% Revenue will be allocated for [COMMUNITY CHEST].</li>
+        <li>5% Revenue for Amenities and Team Allocation.</li>
+      </ul>
+
+      <div class="sub-title">THIRD MILESTONE</div>
+      <ul>
+        <li>50% Revenue will be allocated for [COMMUNITY CHEST].</li>
+        <li>30% Revenue will be used for NFT sweep.</li>
+        <li>20% Revenue will be used for Amenities and Team Allocation.</li>
+      </ul>
+
+      <div class="sub-title">FOURTH MILESTONE</div>
+      <ul>
+        <li>75% Revenue will be used for [COMMUNITY CHEST] a week before it's still locked.</li>
+        <li>25% Revenue will be used for Amenities and Team Allocation.</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== REWARD SYSTEM ===== -->
+  <section id="rewards" class="section">
+    <div class="section-label">// HOLDER INCENTIVES</div>
+    <h2 class="section-title">[REWARD SYSTEM]</h2>
+
+    <div class="content-block">
+      <p>Holders will be rewarded by participating on Giveaways, Token Airdrop and Much more. A [COMMUNITY TREASURY]
+        will be formed to create transparency for all holders. This treasuries will then be shared by 3 sectors
+        [COMMUNITY CHEST], [TOKEN AIRDROP] and [LEADERBOARD AWARDS]. Each [MILESTONES] will then reward all holders
+        based on the [ROADMAP] and [MILESTONE] it takes effect on.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== CARE HANDLER DEMO ===== -->
+  <section id="sneaks" class="section">
+    <div class="section-label">// [BESTFRIENDS] CARE SYSTEM TEST-DEMO</div>
+    <h2 class="section-title">[BESTFRIENDS] CARE HANDLER</h2>
+    <div class="section-sub">Stake and take care your [BESTFRIENDS]. They get hungry. They get dirty. They lose their
+      minds. Click
+      a [BESTFRIENDS] to take care of them — or don't. See what happens.</div>
+    <div class="sneak-grid" id="sneakGrid"></div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== BEST FRIENDS TEASER ===== -->
+  <section id="bestfriends" class="section" style="text-align:center">
+    <div class="section-label">// [BEST FRIENDS] PROTOCOL</div>
+    <h2 class="section-title">CREATE YOUR OWN<br><span class="accent">[BEST FRIENDS]</span></h2>
+    <div class="gen-intro">
+      <h3>[SYSTEM_INIT]: BEST FRIENDS PROTOCOL v2.0</h3>
+      <p>Each entity is generated from layered pixel data — unique palettes, faces, clothing, and moods assembled in
+        real-time. Pull the trigger. Meet your new Best Friend.</p>
+    </div>
+    <a href="generator.html" class="btn-primary" style="font-size:14px;padding:20px 40px">▶ ENTER THE GENERATOR</a>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== MINIGAME ===== -->
+  <section id="minigame" class="section" style="text-align:center">
+    <div class="section-label">//MINI-GAME</div>
+    <h2 class="section-title">[BEST FRIEND RUN]</h2>
+    <div class="section-sub">Help your Best Friend escape the [MONSTERS]. Press SPACE to jump.</div>
+    <div class="game-container">
+      <div class="game-hud"><span id="gameScore">SCORE: 0</span><span id="gameHigh">HIGH: 0</span></div>
+      <canvas id="gameCanvas" width="800" height="250"></canvas>
+      <div id="gameOverlay" class="game-overlay">
+        <div class="game-overlay-text">PRESS SPACE TO RESTART</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== MINT ===== -->
+  <section id="mint" class="section" style="text-align:center">
+    <div class="section-label">// SYSTEM STATUS</div>
+    <h2 class="section-title">[MINT STATUS]</h2>
+    <div class="mint-terminal">
+      <div class="mint-terminal-header">
+        <span>◈ TRANSMISSION INCOMING</span>
+        <span class="mint-blink">● LIVE</span>
+      </div>
+      <div class="mint-terminal-body">
+        <div class="mint-headline">MINT IS COMING.</div>
+        <p class="mint-desc">5,000 Entities. One contract. Forever on BASE.<br>Follow <a href="https://x.com/mijajake"
+            target="_blank" style="color:var(--g)">@mijajake</a> to be first when the date
+          drops.</p>
+        <div class="mint-stats">
+          <div class="mint-stat">
+            <div class="mint-stat-val">5,000</div>
+            <div class="mint-stat-lbl">SUPPLY</div>
+          </div>
+          <div class="mint-stat">
+            <div class="mint-stat-val">TBA</div>
+            <div class="mint-stat-lbl">PRICE</div>
+          </div>
+          <div class="mint-stat">
+            <div class="mint-stat-val">ETH</div>
+            <div class="mint-stat-lbl">NETWORK</div>
+          </div>
+          <div class="mint-stat">
+            <div class="mint-stat-val">∞</div>
+            <div class="mint-stat-lbl">ON-CHAIN</div>
+          </div>
+        </div>
+        <div class="mint-progress">
+          <div class="mint-progress-label">MINTED: <span id="mintCount">0</span> / 5,000</div>
+          <div class="mint-bar">
+            <div class="mint-bar-fill" id="mintFill" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="mint-btns">
+          <a href="https://x.com/mijajake" target="_blank" class="btn-primary">FOLLOW @MIJAJAKE</a>
+          <a href="https://opensea.io/collection/test-exe-collection" target="_blank" class="btn-outline">VIEW ON
+            OPENSEA</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== TOKENOMICS ===== -->
+  <section id="tokenomics" class="section">
+    <div class="section-label">// TOKEN ECONOMICS</div>
+    <h2 class="section-title">[TOKENOMICS]</h2>
+    <div class="content-block">
+      <p>At [SECOND MILESTONE] a [TOKEN] still TBA will be created to be used as different transactions on the website,
+        mostly will be used on [BEST FRIENDS] "Care Handler". 50% of all [TOKENS] used will go through [REWARD SYSTEM]
+        mainly on [TOKEN AIRDROP] while 50% will be used to burn.</p>
+      <br>
+      <p>An allocation of 30-50% token must the [COMMUNITY TREASURY] hold from the start, therefore a [TOKEN] buyback is
+        implemented on [SECOND MILESTONE] until the [COMMUNITY TREASURY] will attain 30-50% token holdings.</p>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="footer-logo">test<span class="exe">.exe</span></div>
+    <div class="footer-links">
+      <a href="https://x.com/mijajake" target="_blank">X / TWITTER</a>
+      <a href="https://opensea.io/collection/test-exe-collection" target="_blank">OPENSEA</a>
+      <a href="generator.html">GENERATOR</a>
+      <a href="#milestone">MILESTONE</a>
+    </div>
+    <div class="footer-copy">test.exe &mdash; source: UNKNOWN &mdash; do not distribute</div>
+    <div class="footer-warn">&#9888; UNAUTHORIZED ACCESS WILL BE LOGGED &#9888;</div>
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="minigame.js"></script>
 </body>
 
 </html>

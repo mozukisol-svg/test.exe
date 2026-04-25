@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <title>test.exe — [BESTFRIENDS] Care Handler</title>
+  <meta name="description" content="Take care of your Best Friend. Feed them. Clean them. Don't let them lose their mind.">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .care-wrap{max-width:800px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:start}
+    .care-left{text-align:center}
+    .care-nft{position:relative;border:2px solid var(--g3);background:#000;overflow:hidden;box-shadow:0 0 40px rgba(0,255,65,.06)}
+    .care-nft canvas{display:block;width:100%;image-rendering:pixelated;image-rendering:crisp-edges;cursor:grab}
+    .care-nft canvas:active{cursor:grabbing}
+    .care-nft .cv-scan{position:absolute;top:0;left:0;width:100%;height:4px;background:rgba(0,255,65,.06);animation:scanmv 3s linear infinite;pointer-events:none}
+    .care-name{font-family:var(--px);font-size:14px;color:var(--g);letter-spacing:3px;margin:16px 0 4px;animation:pulse 3s infinite}
+    .care-desc{font-family:var(--vt);font-size:18px;color:var(--d);margin-bottom:8px}
+    .pet-msg{font-family:var(--px);font-size:7px;color:var(--g);letter-spacing:1px;min-height:16px;opacity:0;transition:opacity .3s}
+    .pet-msg.show{opacity:1}
+
+    .care-right{}
+    .stat-block{background:rgba(10,15,10,.9);border:1px solid var(--b2);padding:16px;margin-bottom:12px}
+    .stat-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .stat-row:last-child{margin-bottom:0}
+    .stat-label{font-family:var(--px);font-size:7px;color:var(--d);letter-spacing:2px;min-width:100px}
+    .stat-bar-wrap{flex:1;margin:0 12px;height:10px;background:var(--d2);border:1px solid var(--b2);overflow:hidden;position:relative}
+    .stat-bar-fill{height:100%;transition:width .5s ease,background .5s ease}
+    .stat-val{font-family:var(--px);font-size:7px;color:var(--g);letter-spacing:1px;min-width:30px;text-align:right}
+
+    .care-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+    .care-btn{font-family:var(--px);font-size:8px;padding:16px 8px;border:2px solid var(--g3);background:rgba(0,20,0,.4);color:var(--g);letter-spacing:2px;cursor:none;transition:all .08s;text-align:center}
+    .care-btn:hover{background:rgba(0,255,65,.1);border-color:var(--g);transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--g3)}
+    .care-btn:active{transform:translate(2px,3px);box-shadow:none}
+    .care-btn.disabled{opacity:.3;pointer-events:none}
+    .care-btn-icon{display:block;font-size:20px;margin-bottom:6px}
+    .care-log{margin-top:16px;background:rgba(0,10,0,.6);border:1px solid var(--b2);padding:12px;max-height:120px;overflow-y:auto;font-family:var(--mono);font-size:12px;color:var(--g3);line-height:1.8}
+    .care-log::-webkit-scrollbar{width:4px}
+    .care-log::-webkit-scrollbar-track{background:var(--d2)}
+    .care-log::-webkit-scrollbar-thumb{background:var(--g3)}
+
+    .sleep-timer{font-family:var(--px);font-size:7px;color:var(--g3);letter-spacing:1px;text-align:center;margin-top:8px;min-height:14px}
+
+    @media(max-width:700px){.care-wrap{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<canvas id="staticBg"></canvas>
+<div id="glitchOverlay"></div>
+<div id="cursorDot"></div>
+<div id="particleContainer"></div>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo">test<span class="exe">.exe</span></a>
+  <div class="nav-links">
+    <a href="index.html">HOME</a>
+    <a href="index.html#sneaks">CARE HANDLER</a>
+    <a href="generator.html">GENERATOR</a>
+    <a href="https://x.com/mijajake" target="_blank" class="nav-cta">NOTIFY ME</a>
+  </div>
+</nav>
+
+<div class="marquee">
+  <div class="marquee-inner">
+    <span>⚠ [BESTFRIENDS] CARE PROTOCOL ACTIVE ⚠</span><span>MONITORING VITAL SIGNS...</span><span>test.exe</span><span>DO NOT ABANDON YOUR ENTITY</span>
+    <span>⚠ [BESTFRIENDS] CARE PROTOCOL ACTIVE ⚠</span><span>MONITORING VITAL SIGNS...</span><span>test.exe</span><span>DO NOT ABANDON YOUR ENTITY</span>
+  </div>
+</div>
+
+<section class="section" style="padding-top:140px">
+  <div class="section-label">// [BESTFRIENDS] CARE HANDLER v1.0</div>
+  <h2 class="section-title" id="careName">LOADING...</h2>
+
+  <div class="care-wrap">
+    <div class="care-left">
+      <div class="care-nft">
+        <canvas id="careCanvas" width="512" height="512"></canvas>
+        <div class="cv-scan"></div>
+      </div>
+      <div class="care-name" id="careNameSm"></div>
+      <div class="care-desc" id="careDesc"></div>
+      <div class="care-desc" style="color:var(--g3);font-size:14px;margin-top:4px">Take care of them and they will [REWARD] you. Keep all stats green to earn rewards.</div>
+      <div class="pet-msg" id="petMsg">♥ THEY FEEL CALMER ♥</div>
+    </div>
+
+    <div class="care-right">
+      <div class="stat-block">
+        <div class="stat-row"><span class="stat-label">HUNGER</span><div class="stat-bar-wrap"><div class="stat-bar-fill" id="hungerBar"></div></div><span class="stat-val" id="hungerVal">0</span></div>
+        <div class="stat-row"><span class="stat-label">THIRST</span><div class="stat-bar-wrap"><div class="stat-bar-fill" id="thirstBar"></div></div><span class="stat-val" id="thirstVal">0</span></div>
+        <div class="stat-row"><span class="stat-label">INSANITY</span><div class="stat-bar-wrap"><div class="stat-bar-fill" id="insanityBar"></div></div><span class="stat-val" id="insanityVal">0</span></div>
+        <div class="stat-row"><span class="stat-label">CLEANLINESS</span><div class="stat-bar-wrap"><div class="stat-bar-fill" id="cleanBar"></div></div><span class="stat-val" id="cleanVal">0</span></div>
+        <div class="stat-row"><span class="stat-label">ENERGY</span><div class="stat-bar-wrap"><div class="stat-bar-fill" id="energyBar"></div></div><span class="stat-val" id="energyVal">0</span></div>
+        <div style="border-top:1px solid var(--b2);margin:8px 0"></div>
+        <div class="stat-row"><span class="stat-label" style="color:var(--g)">REWARD</span><div class="stat-bar-wrap"><div class="stat-bar-fill" id="rewardBar" style="background:linear-gradient(90deg,#ffd700,#ffaa00)"></div></div><span class="stat-val" id="rewardVal" style="color:#ffd700">0</span></div>
+        <button class="care-btn" id="btnClaim" onclick="claimReward()" style="display:none;margin-top:8px;border-color:#ffd700;color:#ffd700;width:100%;font-size:10px"><span class="care-btn-icon">🏆</span>CLAIM [REWARD]</button>
+      </div>
+
+      <div class="care-actions">
+        <button class="care-btn" id="btnEat" onclick="doAction('eat')"><span class="care-btn-icon">🍖</span>EAT</button>
+        <button class="care-btn" id="btnDrink" onclick="doAction('drink')"><span class="care-btn-icon">💧</span>DRINK</button>
+        <button class="care-btn" id="btnClean" onclick="doAction('clean')"><span class="care-btn-icon">🛁</span>BATH</button>
+        <button class="care-btn" id="btnSleep" onclick="doAction('sleep')"><span class="care-btn-icon">💤</span>SLEEP</button>
+      </div>
+      <div class="sleep-timer" id="sleepTimer"></div>
+
+      <div class="care-log" id="careLog"></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-logo">test<span class="exe">.exe</span></div>
+  <div class="footer-links">
+    <a href="index.html">HOME</a>
+    <a href="index.html#sneaks">CARE HANDLER</a>
+    <a href="https://x.com/mijajake" target="_blank">X / TWITTER</a>
+  </div>
+  <div class="footer-copy">test.exe &mdash; source: UNKNOWN &mdash; do not distribute</div>
+</footer>
+
+<script src="care.js"></script>
+</body>
+</html>

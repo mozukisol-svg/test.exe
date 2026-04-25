@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <title>test.exe — [BEST FRIENDS] Generator</title>
+  <meta name="description" content="Create your own Best Friend entity. Each one generated from layered pixel data. Source: UNKNOWN.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<canvas id="staticBg"></canvas>
+<div id="glitchOverlay"></div>
+<div id="flash"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">test<span class="exe">.exe</span></a>
+  <div class="nav-links">
+    <a href="index.html">HOME</a>
+    <a href="index.html#milestone">MILESTONE</a>
+    <a href="index.html#economics">ECONOMICS</a>
+    <a href="index.html#rewards">REWARDS</a>
+    <a href="index.html#tokenomics">TOKENOMICS</a>
+    <a href="https://x.com/mijajake" target="_blank" class="nav-cta">NOTIFY ME</a>
+  </div>
+</nav>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-inner">
+    <span>⚠ BEST FRIENDS PROTOCOL ACTIVE ⚠</span><span>GENERATING ENTITIES...</span><span>test.exe</span><span>DO NOT CLOSE THIS WINDOW</span>
+    <span>⚠ BEST FRIENDS PROTOCOL ACTIVE ⚠</span><span>GENERATING ENTITIES...</span><span>test.exe</span><span>DO NOT CLOSE THIS WINDOW</span>
+  </div>
+</div>
+
+<!-- GENERATOR -->
+<section class="section" style="padding-top:140px;text-align:center">
+  <div class="section-label">// ENTITY GENERATOR</div>
+  <h1 class="section-title">CREATE YOUR OWN<br><span class="accent">[BEST FRIENDS]</span></h1>
+
+  <div class="gen-intro">
+    <h3>[SYSTEM_INIT]: BEST FRIENDS PROTOCOL v2.0</h3>
+    <p>Each entity is generated from layered pixel data — unique palettes, faces, clothing, and moods assembled in real-time. Pull the trigger. Meet your new Best Friend.</p>
+  </div>
+
+  <div class="gen-wrap">
+    <div class="gen-bar">
+      <div class="gen-bar-l">
+        <div class="gen-bar-title">test<span class="exe">.exe</span></div>
+        <button id="musicToggle" onclick="toggleMusic()">MUSIC: ON</button>
+      </div>
+      <div id="pulls">ENTITIES: 0</div>
+    </div>
+
+    <div class="cv-wrap" id="cvWrap">
+      <canvas id="cv" width="512" height="512" style="width:min(90vw,400px);height:min(90vw,400px)"></canvas>
+      <div class="cv-scan"></div>
+      <div class="cv-glow"></div>
+    </div>
+
+    <div id="status"></div>
+    <button id="execBtn" onclick="generate()">&#9654; EXECUTE<span style="animation:blink .8s step-end infinite">|</span></button>
+
+    <div class="traits" id="traits"></div>
+    <div class="mood" id="mood">
+      <div class="mood-head">
+        <span class="mood-lbl">MOOD ANALYSIS</span>
+        <span class="mood-val" id="moodVal"></span>
+      </div>
+      <div class="mood-bar"><div class="mood-fill" id="moodFill"></div></div>
+      <div class="mood-ticks"><span>RAGE</span><span>ANGRY</span><span>UNEASY</span><span>CALM</span><span>HAPPY</span></div>
+    </div>
+    <div class="acts" id="acts">
+      <button class="ab ab-r" onclick="download()">EXTRACT</button>
+      <button class="ab ab-tw" onclick="tweet()">TRANSMIT</button>
+      <button class="ab ab-d" onclick="window.open('https://opensea.io/collection/test-exe-collection','_blank')">[REDACTED]</button>
+    </div>
+    <div class="warn">&#9888; FILE ORIGIN UNKNOWN &#9888;</div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-logo">test<span class="exe">.exe</span></div>
+  <div class="footer-links">
+    <a href="https://x.com/mijajake" target="_blank">X / TWITTER</a>
+    <a href="index.html">HOME</a>
+    <a href="https://opensea.io/collection/test-exe-collection" target="_blank">OPENSEA</a>
+  </div>
+  <div class="footer-copy">test.exe &mdash; source: UNKNOWN &mdash; do not distribute</div>
+  <div class="footer-warn">&#9888; UNAUTHORIZED ACCESS WILL BE LOGGED &#9888;</div>
+</footer>
+
+<script src="generator.js"></script>
+</body>
+</html>
