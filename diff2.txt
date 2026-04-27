@@ -1,0 +1,110 @@
+﻿diff --git a/app.js b/app.js
+index ecf451f..4d1cee5 100644
+--- a/app.js
++++ b/app.js
+@@ -113,12 +113,12 @@
+   const names=['DATA FIEND','NEON WRAITH','PIXEL PHANTOM','TOXIC SHADE','CRIMSON DRIFTER','GHOST BYTE','CYBER HUSK','GLITCH BORN'];
+   const subs=['Feeds on corrupted files.','Cries when left alone.','Won\'t stop staring.','Eats everything.','Sleeps too much.','Afraid of the dark.','Hates water.','Talks to walls.'];
+ 
+-  for(let idx=0;idx<8;idx++){
++  for(let idx=0;idx<9;idx++){
+     rs = (idx === 0 ? 420 : 100+idx*777);
+     img.fill(0);
+-    const isBuddy = idx%2 === 1; // alternate between BUDDY and BESTFRIEND
++    const type = (idx % 3 === 0) ? 'BUDDY' : (idx % 3 === 1) ? 'BESTFRIEND' : 'MONSTER';
+     
+-    if(isBuddy) {
++    if(type === 'BUDDY') {
+       let p={...VPALS[rc(vpn)]};
+       const CX=16,CY=18,RX=12,RY=13,CAP_Y=14,FACE_Y=21;
+       const hat=ri(0,5),eye=ri(0,5),mouth=ri(0,5),pat=ri(0,4),bgPat=ri(0,6);
+@@ -148,10 +148,9 @@
+       const eY=17,eLX=CX-5,eRX=CX+2;
+       for(const ex of[eLX,eRX]){rect(ex,eY,ex+1,eY+1,p.outline);px(ex+(eye===3?1:0),eY,eye===3?p.accent:p.bg);}
+       px(CX,18,p.outline);
+-      const mY=FACE_Y-1;
+       if(mouth===0||mouth===2){hl(mY,CX-2,CX+2,p.outline);px(CX-3,mY-1,p.outline);px(CX+3,mY-1,p.outline);}
+       else{hl(mY,CX-2,CX+2,p.outline);}
+-    } else {
++    } else if (type === 'BESTFRIEND') {
+       let p={...PALS[rc(pn)]};
+       for(let y=0;y<S;y++)for(let x=0;x<S;x++)px(x,y,p.bg);
+       const cx2=S/2+ri(-2,3),hy=ri(9,14),hw=ri(10,14),hh=ri(10,14);
+@@ -165,7 +164,28 @@
+       const my=hy+hh-3,mw=Math.floor(hw/3),mx=cx2-Math.floor(mw/2);
+       hl(my,mx,mx+mw,p.outline);
+       const ny=hy+hh+1,nw=Math.floor(hw/4);rect(cx2-nw,ny,cx2+nw,ny+2,p.skin,p.outline);
++      rect(cx2-nw,ny,cx2+nw,ny+2,p.skin,p.outline);
+       rect(cx2-7,ny+2,cx2+7,S-1,p.clothing,p.outline);
++    } else {
++      // MONSTER (Rare)
++      const p = {bg:[10,10,10],skin:[200,200,200],outline:[0,0,0],hair:[150,150,150],eyes:[255,255,255],clothing:[80,80,80],accent:[180,180,180]};
++      const DK=[8,8,8],MD=[80,80,80],LT=[170,170,170],WH=[230,230,230],CX=16;
++      const hood=ri(0,5),skull=ri(0,5),robe=ri(0,4),weapon=ri(0,5),sigil=ri(0,5);
++      for(let y=0;y<S;y++)for(let x=0;x<S;x++){const v=8+Math.floor(Math.sin(x*.7+y*.5)*4);px(x,y,[v,v,v]);}
++      if(skull<3)for(let y=0;y<S;y+=4)for(let x=0;x<S;x+=5){const sv=Math.sin(x*7.3+y*13.7);if(sv>.82){const bv=30+Math.floor(sv*50);px(x,y,[bv,bv,bv]);}}
++      for(let y=0;y<13;y++)for(let x=0;x<S;x++){const dx=x-CX,dy=y-8,d=(dx/9)**2+(dy/7)**2;if(d<1)px(x,y,DK);else if(d<1.18)px(x,y,MD);}
++      if(hood===0){px(CX,1,MD);px(CX,2,DK);} else if(hood===2){for(let x=8;x<24;x+=3)px(x,12,DK);} else if(hood===3){for(const cx2 of[CX-3,CX,CX+3])for(let dy=0;dy<3;dy++)px(cx2,dy+1,MD);} else if(hood===4){px(CX-3,1,MD);px(CX+3,1,MD);px(CX-3,2,DK);px(CX+3,2,DK);}
++      const fY=11;
++      for(let y=fY;y<fY+8;y++)for(let x=0;x<S;x++){const dx=x-CX,dy=y-fY-4,d=(dx/5)**2+(dy/4)**2;if(d<1)px(x,y,WH);else if(d<1.2)px(x,y,LT);}
++      for(const ex of[CX-2,CX+2])for(let dy=0;dy<2;dy++)for(let dx=-1;dx<=1;dx++)px(ex+dx,fY+2+dy,DK); 
++      px(CX-1,fY+5,DK);px(CX+1,fY+5,DK); 
++      for(let x=CX-3;x<=CX+3;x++)px(x,fY+6,DK); 
++      for(let x=CX-2;x<=CX+2;x+=2)px(x,fY+7,WH); 
++      if(skull===1){px(CX+1,fY,DK);px(CX+2,fY+1,DK);px(CX+1,fY+2,DK);} else if(skull===3){for(let i=0;i<4;i++){px(CX-4-i,fY-i,MD);px(CX+4+i,fY-i,MD);}} else if(skull===4){for(let i=-3;i<=3;i++)px(CX+i,fY-1,MD);for(const cx2 of[CX-2,CX,CX+2])px(cx2,fY-2,WH);}
++      for(let y=19;y<S;y++){const sp=Math.floor((y-19)*.55),x1=Math.max(0,8-sp),x2=Math.min(S-1,23+sp);for(let x=x1;x<=x2;x++)px(x,y,DK);if(robe===0){px(x1,y,MD);px(x2,y,MD);}else if(robe===1&&y%3===0){px(x1+2,y,MD);px(x2-2,y,MD);}else if(robe===3&&(y-19)%3===0)for(let x=x1+2;x<=x2-2;x+=3)px(x,y,MD);}
++      if(weapon===1){for(let y=8;y<28;y++)px(25,y,MD);for(let i=0;i<5;i++){px(25-i,8+i,LT);px(24-i,8+i,MD);}} else if(weapon===2){for(let y=19;y<25;y++)for(let x=6;x<10;x++)px(x,y,MD);px(8,18,MD);px(8,19,WH);px(8,20,WH);} else if(weapon===3){for(let y=18;y<25;y++){const w=Math.abs(y-21);for(let x=6-w;x<=9+w;x++)px(x,y,MD);}} else if(weapon===4){for(let y=5;y<28;y++)px(24,y,MD);for(const dx of[-1,0,1])px(24+dx,5,WH);}
++      const siX=CX,siY=24;
++      if(sigil===1){for(const[dx,dy]of[[0,0],[0,-1],[0,1],[-1,0],[1,0]])px(siX+dx,siY+dy,MD);px(siX,siY,WH);} else if(sigil===2){px(siX,siY-1,MD);px(siX,siY,MD);px(siX,siY+1,MD);px(siX-1,siY,MD);px(siX+1,siY,MD);} else if(sigil===3){for(let d=0;d<3;d++){px(siX-1+d,siY-1+d,LT);px(siX+1-d,siY-1+d,LT);}} else if(sigil===4){for(const[dx,dy]of[[0,-1],[0,1],[-1,0],[1,0],[-1,-1],[1,-1],[-1,1],[1,1]])px(siX+dx,siY+dy,LT);px(siX,siY,WH);}
+     }
+ 
+     const c=document.createElement('canvas');c.width=O;c.height=O;
+@@ -180,12 +200,16 @@
+ 
+     const card = document.createElement('a');
+     card.className = 'sneak-card';
+-    card.href = isBuddy ? 'buddy.html?id='+idx : 'care.html?id='+idx;
++    card.href = type === 'BUDDY' ? 'buddy.html?id='+idx : type === 'BESTFRIEND' ? 'care.html?id='+idx : 'monster.html?id='+idx;
+     card.style.textDecoration='none';card.style.cursor='none';
+     card.appendChild(c);
+     const info = document.createElement('div');
+     info.className = 'sneak-card-info';
+-    info.innerHTML = `<div class="sneak-card-name">${names[idx]}</div><div class="sneak-card-sub">${subs[idx]}</div>`;
++    info.style.textAlign = 'center';
++    info.style.padding = '15px';
++    info.style.background = type === 'MONSTER' ? 'rgba(255,32,64,0.1)' : 'rgba(0,255,65,0.1)';
++    info.style.borderTop = '1px solid var(--g3)';
++    info.innerHTML = `<div style="font-family:var(--px); font-size:12px; color:${type==='MONSTER'?'#ff2040':'var(--g)'}; letter-spacing:2px; animation:pulse 2s infinite;">Γû╢ ENTER [${type}]</div>`;
+     card.appendChild(info);
+     grid.appendChild(card);
+   }
+@@ -324,3 +348,29 @@
+     playClick();
+   });
+ })();
++
++// ===== DYNAMIC TEXT CYCLER =====
++(function(){
++  const heroText = document.getElementById('dynamicHeroText');
++  if(!heroText) return;
++  const types = ['BUDDY', 'BEST FRIEND', 'MONSTER'];
++  let idx = 0;
++  setInterval(() => {
++    idx = (idx + 1) % types.length;
++    heroText.style.opacity = 0;
++    setTimeout(() => {
++      heroText.textContent = '[' + types[idx] + ']';
++      if(types[idx] === 'MONSTER') {
++          heroText.style.color = '#ff2040';
++          heroText.style.textShadow = '0 0 10px rgba(255,0,0,0.5)';
++      } else if(types[idx] === 'BUDDY') {
++          heroText.style.color = 'var(--g)';
++          heroText.style.textShadow = 'none';
++      } else {
++          heroText.style.color = 'var(--g)';
++          heroText.style.textShadow = 'none';
++      }
++      heroText.style.opacity = 1;
++    }, 200); // Wait for fade out
++  }, 2500); // Change every 2.5 seconds
++})();

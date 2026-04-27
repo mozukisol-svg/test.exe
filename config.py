@@ -66,6 +66,39 @@ PALETTES = {
 }
 PALETTE_NAMES = list(PALETTES.keys())
 
+# ── Vivid Palettes — bright retro game colours (Common art style) ─────────────
+VIVID_PALETTES = {
+    "Scarlet":    {"bg":(220,50,50),   "skin":(245,185,115),"outline":(50,10,0),
+                   "hair":(100,40,10), "eyes":(255,230,20),  "clothing":(160,20,20), "accent":(255,180,0)},
+    "Emerald":    {"bg":(30,130,45),   "skin":(230,195,130),"outline":(0,50,10),
+                   "hair":(60,30,10),  "eyes":(50,230,80),   "clothing":(20,100,20), "accent":(220,210,50)},
+    "Sapphire":   {"bg":(40,80,200),   "skin":(235,190,140),"outline":(0,20,80),
+                   "hair":(20,20,80),  "eyes":(120,200,255), "clothing":(20,60,180), "accent":(200,230,255)},
+    "Amber":      {"bg":(200,130,0),   "skin":(240,200,130),"outline":(80,40,0),
+                   "hair":(100,50,10), "eyes":(255,100,0),   "clothing":(160,80,0),  "accent":(255,220,80)},
+    "Violet":     {"bg":(100,20,180),  "skin":(220,180,230),"outline":(40,0,80),
+                   "hair":(180,100,255),"eyes":(255,180,255),"clothing":(80,10,160), "accent":(255,220,255)},
+    "Cobalt":     {"bg":(20,100,200),  "skin":(200,220,240),"outline":(0,40,100),
+                   "hair":(0,60,140),  "eyes":(0,220,255),   "clothing":(10,70,160), "accent":(180,240,255)},
+    "Tangerine":  {"bg":(240,120,20),  "skin":(255,200,140),"outline":(80,30,0),
+                   "hair":(140,60,10), "eyes":(255,60,0),    "clothing":(200,80,0),  "accent":(255,220,100)},
+    "Mint":       {"bg":(40,180,140),  "skin":(200,240,220),"outline":(0,80,60),
+                   "hair":(0,120,80),  "eyes":(0,255,180),   "clothing":(10,140,100),"accent":(200,255,220)},
+    "Rose":       {"bg":(220,80,120),  "skin":(255,215,185),"outline":(80,0,40),
+                   "hair":(160,20,60), "eyes":(255,100,160), "clothing":(180,30,80), "accent":(255,200,220)},
+    "Goldenrod":  {"bg":(200,160,20),  "skin":(245,205,140),"outline":(80,50,0),
+                   "hair":(120,70,10), "eyes":(80,50,10),    "clothing":(160,120,0), "accent":(255,230,100)},
+}
+VIVID_PALETTE_NAMES = list(VIVID_PALETTES.keys())
+
+# ── Type tiers & rarity weights ──────────────────────────────────────────────
+# BUDDY = Common (60%) | BESTFRIEND = Uncommon (30%) | MONSTER = Rare (10%)
+TYPE_WEIGHTS = {
+    "BUDDY":      0.60,
+    "BESTFRIEND": 0.30,
+    "MONSTER":    0.10,
+}
+
 # ── Palette-specific descriptions for metadata ───────────────────────────────
 PALETTE_DESCRIPTIONS = {
     "Cosmic":    "Recovered from sector 7G. The nebula data corrupted its form, leaving traces of distant stars in its pixels.",

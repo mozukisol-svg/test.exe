@@ -5,6 +5,7 @@ import argparse, hashlib, json, os, time
 from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw
+import math
 from config import *
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -287,15 +288,22 @@ SPECIAL_SKINS = {
 # MAIN CHARACTER GENERATOR
 # ─────────────────────────────────────────────────────────────────────────────
 def generate_character(rng, palette_name):
-    p  = dict(PALETTES[palette_name])
+    # ── Type selection: BUDDY=Common(60%) BESTFRIEND=Uncommon(30%) MONSTER=Rare(10%) ──
+    style_names = list(TYPE_WEIGHTS.keys())
+    style_w     = np.array(list(TYPE_WEIGHTS.values()), dtype=float)
+    style_w    /= style_w.sum()
+    art_style   = style_names[int(rng.choice(len(style_names), p=style_w))]
 
-    # ── Ultra-rare: Monochrome B&W override (0.1% chance) ─────────────────
-    is_monochrome = rng.random() < 0.001
-    if is_monochrome:
+    if art_style == "MONSTER":
         palette_name = "Monochrome"
-        p = {"bg": (10, 10, 10),    "skin": (200, 200, 200), "outline": (0, 0, 0),
+        p = {"bg": (10, 10, 10),     "skin": (200, 200, 200), "outline": (0, 0, 0),
              "hair": (150, 150, 150), "eyes": (255, 255, 255),
              "clothing": (80, 80, 80), "accent": (180, 180, 180)}
+    elif art_style == "BUDDY":
+        palette_name = VIVID_PALETTE_NAMES[int(rng.integers(0, len(VIVID_PALETTE_NAMES)))]
+        p = dict(VIVID_PALETTES[palette_name])
+    else:  # BESTFRIEND — existing dark/corrupted palettes
+        p = dict(PALETTES[palette_name])
 
     img = Image.new("RGB", (S, S), p['bg'])
 
@@ -381,6 +389,8 @@ def generate_character(rng, palette_name):
                     "Heavy"  if glitch_level < 0.6 else "Extreme")
 
     traits = {
+        "Type":       art_style,
+        "Animation":  "GIF",
         "Background": bg_name,
         "Palette":    palette_name,
         "Face Type":  face_type,
@@ -540,24 +550,87 @@ def monochrome_512(arr512):
     return np.stack([gray, gray, gray], axis=2).astype(np.uint8)
 
 
-def save_image(img, path, rng, glitch_level, is_monochrome=False):
-    """Apply voxel shading + glitch effects then save as 512×512 PNG."""
+def save_gif(img, path, rng, glitch_level, art_style, is_monochrome=False):
+    """Apply voxel shading + animations then save as 512×512 animated GIF."""
     arr32 = np.array(img)
-    # Pixel-level glitch at 32px (keep subtle so character stays readable)
+    # Pixel-level glitch at 32px
     if glitch_level > 0.3:
         arr32 = glitch_32(arr32, rng)
-    # Scale up — NEAREST = crisp pixel edges
-    big    = Image.fromarray(arr32).resize((S*OUTPUT_SCALE, S*OUTPUT_SCALE), Image.NEAREST)
+    # Scale up
+    big = Image.fromarray(arr32).resize((S*OUTPUT_SCALE, S*OUTPUT_SCALE), Image.NEAREST)
     arr512 = np.array(big)
-    # Voxel shading pass (always applied)
-    arr512 = voxel_shade(arr512)
-    # Fine glitch at 512px (cap intensity so face stays visible)
-    if glitch_level > 0:
-        arr512 = glitch_512(arr512, rng, intensity=min(glitch_level, 0.55))
-    # Monochrome post-processing (ultra-rare B&W)
+    # Voxel shading pass
+    base_frame = voxel_shade(arr512)
+    # Monochrome post-processing
     if is_monochrome:
-        arr512 = monochrome_512(arr512)
-    Image.fromarray(arr512).save(path, "PNG", optimize=True)
+        base_frame = monochrome_512(base_frame)
+        
+    frames = []
+    num_frames = 12
+    for i in range(num_frames):
+        t = i / float(num_frames) * 2 * math.pi
+        frame = base_frame.copy()
+        
+        if art_style == "BUDDY":
+            dy = int(math.sin(t) * 6)
+            dx = int(math.sin(t * 0.5) * 2)
+            frame = np.roll(frame, dy, axis=0)
+            frame = np.roll(frame, dx, axis=1)
+            # Sparkle effect
+            if math.sin(t * 3) > 0.9:
+                for j in range(3):
+                    a = t * 2 + j * 2.1
+                    r = 512 * 0.38
+                    cx = int(256 + dx + math.cos(a) * r)
+                    cy = int(256 + dy + math.sin(a) * r)
+                    # 8x8 yellow circle
+                    sy1, sy2 = max(0, cy-4), min(512, cy+4)
+                    sx1, sx2 = max(0, cx-4), min(512, cx+4)
+                    for sy in range(sy1, sy2):
+                        for sx in range(sx1, sx2):
+                            if (sx-cx)**2 + (sy-cy)**2 <= 16:
+                                frame[sy, sx] = np.clip(frame[sy, sx] * 0.3 + np.array([255, 220, 0]) * 0.7, 0, 255)
+                                
+        elif art_style == "MONSTER":
+            # Pulse scale
+            pulse = 0.97 + math.sin(t) * 0.03
+            nw, nh = int(512 * pulse), int(512 * pulse)
+            resized = Image.fromarray(frame).resize((nw, nh), Image.NEAREST)
+            frame = np.zeros((512, 512, 3), dtype=np.int32)
+            ox, oy = (512 - nw) // 2, (512 - nh) // 2
+            frame[oy:oy+nh, ox:ox+nw] = np.array(resized)
+            
+            # Static scanlines
+            scan_y = int(i / num_frames * 512)
+            frame[scan_y:min(512, scan_y+3), :] = np.clip(frame[scan_y:min(512, scan_y+3), :] + 10, 0, 255)
+            
+            # Glitch block effect
+            if glitch_level > 0:
+                frame = glitch_512(frame, rng, intensity=min(glitch_level, 0.55))
+            
+            # Random flash
+            if rng.random() < 0.08:
+                frame = np.clip(frame + int(rng.random()*18), 0, 255)
+                
+        else: # BESTFRIEND
+            dy = int(math.sin(t) * 10)
+            tx = int((rng.random() - 0.5) * 14) if rng.random() < 0.08 else 0
+            frame = np.roll(frame, dy, axis=0)
+            frame = np.roll(frame, tx, axis=1)
+            
+            # Red vignette
+            alpha = 0.04 + abs(math.sin(t * 0.7)) * 0.06
+            Y_v, X_v = np.mgrid[0:512, 0:512]
+            dist = np.clip(np.sqrt((X_v-256)**2 + (Y_v-256)**2) / (512*0.7), 0, 1)
+            red_overlay = np.zeros((512, 512, 3), dtype=np.float32)
+            red_overlay[:, :, 0] = 180
+            blend = (dist * alpha)[:, :, np.newaxis]
+            frame = frame * (1 - blend) + red_overlay * blend
+            frame = np.clip(frame, 0, 255)
+            
+        frames.append(Image.fromarray(frame.astype(np.uint8)))
+        
+    frames[0].save(path, save_all=True, append_images=frames[1:], duration=100, loop=0)
 
 
 def tier_for_count(px_count):
@@ -575,7 +648,7 @@ def build_metadata(tid, px_count, tier, traits):
     return {
         "name":         f"Pixelnaut #{tid}",
         "description":  DESCRIPTION,
-        "image":        f"{BASE_URI}{tid}.png",
+        "image":        f"{BASE_URI}{tid}.gif",
         "external_url": f"{EXTERNAL_URL}/{tid}",
         "attributes":   attrs,
     }
@@ -618,13 +691,15 @@ def main():
                 break
             rng = np.random.default_rng(seed + attempt + 1)
 
-        bg_col    = PALETTES.get(traits["Palette"], {"bg": (10,10,10)}).get("bg", (10,10,10))
+        _all_pals = {**PALETTES, **VIVID_PALETTES, "Monochrome": {"bg": (10,10,10)}}
+        bg_col    = _all_pals.get(traits["Palette"], {"bg": (10,10,10)}).get("bg", (10,10,10))
         px_count  = count_pixels(img, bg_col)
         tier      = tier_for_count(px_count)
         stats[tier] += 1
 
         is_mono = traits["Palette"] == "Monochrome"
-        save_image(img, os.path.join(IMAGES_DIR, f"{tid}.png"), rng, glitch_level, is_monochrome=is_mono)
+        art_style = traits["Type"]
+        save_gif(img, os.path.join(IMAGES_DIR, f"{tid}.gif"), rng, glitch_level, art_style, is_monochrome=is_mono)
         meta = build_metadata(tid, px_count, tier, traits)
         with open(os.path.join(METADATA_DIR, f"{tid}.json"), "w") as f:
             json.dump(meta, f, indent=2)

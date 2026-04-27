@@ -188,6 +188,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9997;
 .tr-k{color:var(--d)}
 .tr-v{color:var(--w)}
 .tr-v.rare{color:var(--r);text-shadow:0 0 6px var(--r)}
+.tr-v.uncommon{color:#ff9040;text-shadow:0 0 6px rgba(255,144,64,.6)}
+.tr-v.common{color:var(--g);text-shadow:0 0 6px rgba(0,255,65,.4)}
 .mood{display:none;width:100%;background:var(--p);border:1px solid var(--b2);padding:10px 12px}
 .mood.show{display:block}
 .mood-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}

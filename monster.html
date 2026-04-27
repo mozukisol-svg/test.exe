@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <title>test.exe — [MONSTER] Battle Arena</title>
+  <meta name="description" content="Feed your Monster a SOUL. Wager TOKENS. Fight.">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .arena-wrap{max-width:800px;margin:0 auto;display:grid;grid-template-columns:1fr 1.2fr;gap:30px;align-items:start}
+    .care-left{text-align:center}
+    .care-nft{position:relative;border:2px solid var(--g3);background:#000;overflow:hidden;box-shadow:0 0 40px rgba(0,255,65,.06)}
+    .care-nft canvas{display:block;width:100%;image-rendering:pixelated;image-rendering:crisp-edges;}
+    .care-nft .cv-scan{position:absolute;top:0;left:0;width:100%;height:4px;background:rgba(0,255,65,.06);animation:scanmv 3s linear infinite;pointer-events:none}
+    .care-name{font-family:var(--px);font-size:14px;color:var(--g);letter-spacing:3px;margin:16px 0 4px;animation:pulse 3s infinite}
+    .care-desc{font-family:var(--vt);font-size:18px;color:var(--d);margin-bottom:8px}
+
+    .care-right{}
+    .stat-block{background:rgba(10,15,10,.9);border:1px solid var(--b2);padding:16px;margin-bottom:12px;text-align:center;}
+    
+    .inv-row {display:flex; justify-content:space-between; margin-bottom:10px; font-family:var(--px); font-size:10px; color:var(--g3);}
+    .inv-row span.val {color:var(--g);}
+
+    .wager-input {width:100%; background:rgba(0,10,0,0.8); border:1px solid var(--g3); color:var(--g); font-family:var(--mono); padding:10px; font-size:16px; text-align:center; margin-bottom:15px; outline:none;}
+    .wager-input:focus {border-color:var(--g); box-shadow:0 0 10px rgba(0,255,65,0.2);}
+
+    .care-btn{display:block; width:100%; font-family:var(--px); font-size:10px; padding:20px; border:2px solid var(--g3); background:rgba(0,20,0,.4); color:var(--g); letter-spacing:2px; cursor:none; transition:all .08s; text-align:center;}
+    .care-btn:hover:not(:disabled){background:rgba(0,255,65,.1);border-color:var(--g);transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--g3)}
+    .care-btn:active:not(:disabled){transform:translate(2px,3px);box-shadow:none}
+    .care-btn:disabled{opacity:.3;pointer-events:none; border-color:var(--d2); color:var(--d2);}
+    
+    .arena-log{margin-top:16px;background:rgba(0,10,0,.6);border:1px solid var(--b2);padding:12px;height:250px;overflow-y:auto;font-family:var(--mono);font-size:12px;color:var(--g3);line-height:1.8; text-align:left;}
+    .arena-log::-webkit-scrollbar{width:4px}
+    .arena-log::-webkit-scrollbar-track{background:var(--d2)}
+    .arena-log::-webkit-scrollbar-thumb{background:var(--g3)}
+
+    .log-win {color:#ffd700;}
+    .log-lose {color:#ff2040;}
+    .log-dmg {color:#ffaa00;}
+
+    @media(max-width:700px){.arena-wrap{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<canvas id="staticBg"></canvas>
+<div id="glitchOverlay"></div>
+<div id="cursorDot"></div>
+<div id="particleContainer"></div>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo">test<span class="exe">.exe</span></a>
+  <div class="nav-links">
+    <a href="index.html">HOME</a>
+    <a href="buddy.html">BUDDY EXPEDITION</a>
+    <a href="care.html">BESTFRIEND CARE</a>
+    <a href="monster.html">MONSTER ARENA</a>
+    <a href="generator.html">GENERATOR</a>
+  </div>
+</nav>
+
+<div class="marquee">
+  <div class="marquee-inner">
+    <span style="color:#ff2040;">⚠ [MONSTER] BATTLE ARENA ⚠</span><span style="color:#ff2040;">WAGER YOUR TOKENS</span><span style="color:#ff2040;">test.exe</span><span style="color:#ff2040;">FEED SOULS TO FIGHT</span>
+    <span style="color:#ff2040;">⚠ [MONSTER] BATTLE ARENA ⚠</span><span style="color:#ff2040;">WAGER YOUR TOKENS</span><span style="color:#ff2040;">test.exe</span><span style="color:#ff2040;">FEED SOULS TO FIGHT</span>
+  </div>
+</div>
+
+<section class="section" style="padding-top:140px">
+  <div class="section-label" style="color:#ff2040;">// [MONSTER] ARENA v1.0</div>
+  <h2 class="section-title" id="monsterName" style="color:#ff2040; text-shadow:0 0 10px rgba(255,0,0,0.5);">LOADING...</h2>
+
+  <div class="arena-wrap" style="grid-template-columns: 1fr 1fr; gap:20px;">
+    <div class="care-left" id="playerSide">
+      <div class="care-nft" style="border-color:#00ff41; box-shadow:0 0 40px rgba(0,255,65,.15);">
+        <canvas id="monsterCanvas" width="512" height="512"></canvas>
+        <div class="cv-scan" style="background:rgba(0,255,65,.06);"></div>
+      </div>
+      <div class="care-name" id="monsterNameSm" style="color:#00ff41;"></div>
+      <progress id="playerHp" value="100" max="100" style="width:100%; height:12px; accent-color:#00ff41; background:#111; border:1px solid #00ff41;"></progress>
+      <div style="font-family:var(--px); font-size:10px; color:#00ff41; margin-top:5px; text-align:right;">HP: <span id="playerHpText">100/100</span></div>
+    </div>
+
+    <div class="care-left" id="enemySide" style="opacity:0.3; transition:opacity 0.5s;">
+      <div class="care-nft" style="border-color:#ff2040; box-shadow:0 0 40px rgba(255,32,64,.15);">
+        <canvas id="enemyCanvas" width="512" height="512"></canvas>
+        <div class="cv-scan" style="background:rgba(255,32,64,.06);"></div>
+      </div>
+      <div class="care-name" id="enemyNameSm" style="color:#ff2040;">UNKNOWN GLITCH</div>
+      <progress id="enemyHp" value="100" max="100" style="width:100%; height:12px; accent-color:#ff2040; background:#111; border:1px solid #ff2040;"></progress>
+      <div style="font-family:var(--px); font-size:10px; color:#ff2040; margin-top:5px; text-align:right;">HP: <span id="enemyHpText">100/100</span></div>
+    </div>
+  </div>
+
+  <div class="stat-block" style="border-color:#ff2040; margin-top:20px;">
+    <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px solid #ff2040; padding-bottom:10px;">
+      <div style="font-family:var(--px); font-size:10px; color:var(--g3);">FLOOR: <span id="currentFloorText" style="color:#ffd700;">1</span></div>
+      <div style="font-family:var(--px); font-size:10px; color:var(--g3);">LOOT AT RISK: <span id="lootRiskText" style="color:#00ff41;">0</span></div>
+      <div style="font-family:var(--px); font-size:10px; color:var(--g3);">SOULS: <span id="invSouls" style="color:#ffaa00;">0</span> | TOKENS: <span id="invTokens" style="color:#ffd700;">0</span></div>
+    </div>
+
+    <div id="preBattleMenu">
+      <div style="text-align:left; font-family:var(--px); font-size:8px; color:var(--g3); margin-bottom:5px;">RISK OFFERING (TOKENS):</div>
+      <input type="number" id="wagerAmount" class="wager-input" placeholder="0" min="1">
+      <button class="care-btn" id="btnEnter" onclick="startDungeon()" style="border-color:#ff2040; color:#ff2040; width:100%;">ENTER DUNGEON (-1 SOUL)</button>
+    </div>
+
+    <div id="battleMenu" style="display:none; grid-template-columns:1fr 1fr; gap:10px;">
+      <button class="care-btn" id="btnAttack" onclick="executeAttack()" style="border-color:#ff2040; color:#ff2040; width:100%;">[ATTACK]</button>
+      <button class="care-btn" id="btnHeal" onclick="executeHeal()" style="border-color:#00ff41; color:#00ff41; width:100%;">[HEAL]</button>
+    </div>
+
+    <div id="victoryMenu" style="display:none; grid-template-columns:1fr 1fr; gap:10px;">
+      <button class="care-btn" id="btnProceed" onclick="proceedFloor()" style="border-color:#ff2040; color:#ff2040; width:100%;">PROCEED TO NEXT FLOOR</button>
+      <button class="care-btn" id="btnExit" onclick="exitDungeon()" style="border-color:#ffd700; color:#ffd700; width:100%;">TWEET SCORE & ESCAPE</button>
+    </div>
+  </div>
+
+  <div class="arena-log" id="battleLog">
+    <div>> Arena initialized.</div>
+    <div>> Awaiting Risk Offering...</div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-logo">test<span class="exe">.exe</span></div>
+  <div class="footer-links">
+    <a href="index.html">HOME</a>
+    <a href="buddy.html">BUDDY EXPEDITION</a>
+    <a href="care.html">BESTFRIEND CARE</a>
+    <a href="monster.html">MONSTER ARENA</a>
+  </div>
+  <div class="footer-copy">test.exe &mdash; source: UNKNOWN &mdash; do not distribute</div>
+</footer>
+
+<script src="monster.js"></script>
+</body>
+</html>

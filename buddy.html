@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <title>test.exe — [BUDDY] Expedition</title>
+  <meta name="description" content="Send your BUDDY on a expedition to find food for your Best Friend.">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .care-wrap {
+      max-width: 800px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      align-items: start
+    }
+
+    .care-left {
+      text-align: center
+    }
+
+    .care-nft {
+      position: relative;
+      border: 2px solid var(--g3);
+      background: #000;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0, 255, 65, .06)
+    }
+
+    .care-nft canvas {
+      display: block;
+      width: 100%;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    .care-nft .cv-scan {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(0, 255, 65, .06);
+      animation: scanmv 3s linear infinite;
+      pointer-events: none
+    }
+
+    .care-name {
+      font-family: var(--px);
+      font-size: 14px;
+      color: var(--g);
+      letter-spacing: 3px;
+      margin: 16px 0 4px;
+      animation: pulse 3s infinite
+    }
+
+    .care-desc {
+      font-family: var(--vt);
+      font-size: 18px;
+      color: var(--d);
+      margin-bottom: 8px
+    }
+
+    .care-right {}
+
+    .stat-block {
+      background: rgba(10, 15, 10, .9);
+      border: 1px solid var(--b2);
+      padding: 16px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .expedition-status {
+      font-family: var(--vt);
+      font-size: 24px;
+      color: var(--g);
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    .expedition-timer {
+      font-family: var(--mono);
+      font-size: 32px;
+      color: var(--d);
+      letter-spacing: 4px;
+      margin-bottom: 20px;
+    }
+
+    .care-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px
+    }
+
+    .care-btn {
+      font-family: var(--px);
+      font-size: 10px;
+      padding: 20px 40px;
+      border: 2px solid var(--g3);
+      background: rgba(0, 20, 0, .4);
+      color: var(--g);
+      letter-spacing: 2px;
+      cursor: none;
+      transition: all .08s;
+      text-align: center;
+      width: 100%;
+    }
+
+    .care-btn:hover {
+      background: rgba(0, 255, 65, .1);
+      border-color: var(--g);
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0 var(--g3)
+    }
+
+    .care-btn:active {
+      transform: translate(2px, 3px);
+      box-shadow: none
+    }
+
+    .care-btn.disabled {
+      opacity: .3;
+      pointer-events: none
+    }
+
+    .care-log {
+      margin-top: 16px;
+      background: rgba(0, 10, 0, .6);
+      border: 1px solid var(--b2);
+      padding: 12px;
+      max-height: 160px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--g3);
+      line-height: 1.8
+    }
+
+    .care-log::-webkit-scrollbar {
+      width: 4px
+    }
+
+    .care-log::-webkit-scrollbar-track {
+      background: var(--d2)
+    }
+
+    .care-log::-webkit-scrollbar-thumb {
+      background: var(--g3)
+    }
+
+    @media(max-width:700px) {
+      .care-wrap {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <canvas id="staticBg"></canvas>
+  <div id="glitchOverlay"></div>
+  <div id="cursorDot"></div>
+  <div id="particleContainer"></div>
+
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">test<span class="exe">.exe</span></a>
+    <div class="nav-links">
+      <a href="index.html">HOME</a>
+      <a href="buddy.html">BUDDY EXPEDITION</a>
+      <a href="care.html">BESTFRIEND CARE</a>
+      <a href="monster.html">MONSTER ARENA</a>
+      <a href="generator.html">GENERATOR</a>
+    </div>
+  </nav>
+
+  <div class="marquee">
+    <div class="marquee-inner">
+      <span>⚠ [BUDDY] EXPEDITION PROTOCOL ACTIVE ⚠</span><span>SEARCHING FOR
+        RESOURCES...</span><span>test.exe</span><span>AWAITING RETURN</span>
+      <span>⚠ [BUDDY] EXPEDITION PROTOCOL ACTIVE ⚠</span><span>SEARCHING FOR
+        RESOURCES...</span><span>test.exe</span><span>AWAITING RETURN</span>
+    </div>
+  </div>
+
+  <section class="section" style="padding-top:140px">
+    <div class="section-label">// [BUDDY] EXPEDITION HANDLER v1.0</div>
+    <h2 class="section-title" id="buddyName">LOADING...</h2>
+
+    <div class="care-wrap">
+      <div class="care-left">
+        <div class="care-nft">
+          <canvas id="buddyCanvas" width="512" height="512"></canvas>
+          <div class="cv-scan"></div>
+        </div>
+        <div class="care-name" id="buddyNameSm"></div>
+        <div class="care-desc" id="buddyDesc"></div>
+        <div class="care-desc" style="color:var(--g3);font-size:14px;margin-top:4px">Send your BUDDY on a 5-minute
+          expedition to forage for BESTFRIEND Food, Leaderpoints, and Community Chest points.</div>
+      </div>
+
+      <div class="care-right">
+        <div class="stat-block">
+          <div class="expedition-status" id="expStatus">READY FOR DISPATCH</div>
+          <div class="expedition-timer" id="expTimer">--:--:--</div>
+
+          <div
+            style="text-align:left; font-family:var(--px); font-size:10px; color:var(--g3); margin-top:15px; margin-bottom:5px;">
+            POTENTIAL LOOT:</div>
+          <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <div
+              style="flex:1; border:1px solid var(--g3); padding:10px; background:rgba(0,255,65,0.05); color:var(--g); font-family:var(--mono); font-size:12px;">
+              🍎 FOOD</div>
+            <div
+              style="flex:1; border:1px solid var(--g3); padding:10px; background:rgba(0,255,65,0.05); color:var(--g); font-family:var(--mono); font-size:12px;">
+              🏆 LP</div>
+            <div
+              style="flex:1; border:1px solid var(--g3); padding:10px; background:rgba(0,255,65,0.05); color:var(--g); font-family:var(--mono); font-size:12px;">
+              📦 CP</div>
+          </div>
+
+          <div style="text-align:left; font-family:var(--px); font-size:10px; color:var(--g3); margin-bottom:5px;">
+            EXPEDITION YIELD:</div>
+          <div
+            style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:10px; margin-bottom:2px; color:var(--g);">
+            <span>LEADERPOINTS (LP)</span><span id="lpYield">0</span>
+          </div>
+          <progress id="lpProgress" value="0" max="100"
+            style="width:100%; height:8px; margin-bottom:10px; accent-color:var(--g); background:#111; border:1px solid var(--g3);"></progress>
+
+          <div
+            style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:10px; margin-bottom:2px; color:var(--g);">
+            <span>COMMUNITY CHEST (CP)</span><span id="cpYield">0</span>
+          </div>
+          <progress id="cpProgress" value="0" max="100"
+            style="width:100%; height:8px; margin-bottom:20px; accent-color:var(--g); background:#111; border:1px solid var(--g3);"></progress>
+
+
+          <div class="care-actions">
+            <button class="care-btn" id="btnDispatch" onclick="startExpedition()">DISPATCH BUDDY</button>
+            <button class="care-btn" id="btnClaim" onclick="claimLoot()"
+              style="display:none; border-color:#ffd700; color:#ffd700; font-size:10px">TWEET SCORE & CLAIM
+              LOOT</button>
+          </div>
+        </div>
+
+        <div class="care-log" id="buddyLog">
+          <div>> System initialized.</div>
+          <div>> Awaiting BUDDY dispatch...</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-logo">test<span class="exe">.exe</span></div>
+    <div class="footer-links">
+      <a href="index.html">HOME</a>
+      <a href="buddy.html">BUDDY EXPEDITION</a>
+      <a href="care.html">BESTFRIEND CARE</a>
+      <a href="monster.html">MONSTER ARENA</a>
+    </div>
+    <div class="footer-copy">test.exe &mdash; source: UNKNOWN &mdash; do not distribute</div>
+  </footer>
+
+  <script src="buddy.js"></script>
+</body>
+
+</html>

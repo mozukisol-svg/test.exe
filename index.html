@@ -28,8 +28,9 @@
     <a href="#home" class="nav-logo">test<span class="exe">.exe</span></a>
     <div class="nav-links">
       <a href="#home">HOME</a>
-      <a href="#sneaks">CARE HANDLER</a>
-      <a href="#minigame">MINIGAME</a>
+      <a href="buddy.html">BUDDY EXPEDITION</a>
+      <a href="care.html">BESTFRIEND CARE</a>
+      <a href="monster.html">MONSTER ARENA</a>
       <a href="#mint">MINT</a>
       <a href="#milestone">MILESTONE</a>
       <a href="#tokenomics">TOKENOMICS</a>
@@ -59,8 +60,8 @@
   <section id="home" class="section">
     <div class="hero-grid">
       <div class="hero-left">
-        <div class="section-label">// SYSTEM BOOT v2.0</div>
-        <h1 class="hero-title">EVERY ENTITY<br>HAS A<br><span class="dim">BEST FRIEND.</span></h1>
+        <div class="section-label">// SYSTEM BOOT v1.0 <span style="color:#ff2040; margin-left:10px;">[TEST DEMO]</span></div>
+        <h1 class="hero-title">EVERY ENTITY<br>CAN BE A<br><span class="dim" id="dynamicHeroTitle">[BEST FRIEND]</span></h1>
         <p class="hero-desc">5,000 unique pixel entities. Stored forever on Ethereum. No IPFS. Unknown origin. Infinite
           possibilities.</p>
         <div class="hero-btns">
@@ -197,11 +198,9 @@
 
   <!-- ===== CARE HANDLER DEMO ===== -->
   <section id="sneaks" class="section">
-    <div class="section-label">// [BESTFRIENDS] CARE SYSTEM TEST-DEMO</div>
-    <h2 class="section-title">[BESTFRIENDS] CARE HANDLER</h2>
-    <div class="section-sub">Stake and take care your [BESTFRIENDS]. They get hungry. They get dirty. They lose their
-      minds. Click
-      a [BESTFRIENDS] to take care of them — or don't. See what happens.</div>
+    <div class="section-label">// [ECOSYSTEM] ENTRY POINTS <span style="color:#ff2040; margin-left:10px;">[TEST DEMO]</span></div>
+    <h2 class="section-title">CHOOSE YOUR PROTOCOL</h2>
+    <div class="section-sub">Every entity has a role. Are they a BUDDY, a BEST FRIEND, or a MONSTER? Choose your protocol.</div>
     <div class="sneak-grid" id="sneakGrid"></div>
   </section>
 
@@ -209,33 +208,17 @@
 
   <!-- ===== BEST FRIENDS TEASER ===== -->
   <section id="bestfriends" class="section" style="text-align:center">
-    <div class="section-label">// [BEST FRIENDS] PROTOCOL</div>
-    <h2 class="section-title">CREATE YOUR OWN<br><span class="accent">[BEST FRIENDS]</span></h2>
+    <div class="section-label">// [GENERATOR] PROTOCOL</div>
+    <h2 class="section-title">CREATE YOUR OWN<br><span class="accent" id="dynamicHeroText">[BEST FRIEND]</span></h2>
     <div class="gen-intro">
-      <h3>[SYSTEM_INIT]: BEST FRIENDS PROTOCOL v2.0</h3>
+      <h3>[SYSTEM_INIT]: GENERATOR PROTOCOL v1.0</h3>
       <p>Each entity is generated from layered pixel data — unique palettes, faces, clothing, and moods assembled in
-        real-time. Pull the trigger. Meet your new Best Friend.</p>
+        real-time. Pull the trigger. Meet your new companion.</p>
     </div>
     <a href="generator.html" class="btn-primary" style="font-size:14px;padding:20px 40px">▶ ENTER THE GENERATOR</a>
   </section>
 
-  <hr class="divider">
 
-  <!-- ===== MINIGAME ===== -->
-  <section id="minigame" class="section" style="text-align:center">
-    <div class="section-label">//MINI-GAME</div>
-    <h2 class="section-title">[BEST FRIEND RUN]</h2>
-    <div class="section-sub">Help your Best Friend escape the [MONSTERS]. Press SPACE to jump.</div>
-    <div class="game-container">
-      <div class="game-hud"><span id="gameScore">SCORE: 0</span><span id="gameHigh">HIGH: 0</span></div>
-      <canvas id="gameCanvas" width="800" height="250"></canvas>
-      <div id="gameOverlay" class="game-overlay">
-        <div class="game-overlay-text">PRESS SPACE TO RESTART</div>
-      </div>
-    </div>
-  </section>
-
-  <hr class="divider">
 
   <!-- ===== MINT ===== -->
   <section id="mint" class="section" style="text-align:center">
@@ -313,7 +296,7 @@
   </footer>
 
   <script src="app.js"></script>
-  <script src="minigame.js"></script>
+
 </body>
 
 </html>
