@@ -211,7 +211,7 @@
     info.style.background = type === 'MONSTER' ? 'rgba(255,32,64,0.1)' : 'rgba(0,255,65,0.1)';
     info.style.borderTop = '1px solid var(--g3)';
     let desc = '';
-    if(type === 'BUDDY') desc = 'Dispatch on a 12HR expedition to gather resources.';
+    if(type === 'BUDDY') desc = 'Dispatch on an expedition to gather resources.';
     if(type === 'BESTFRIEND') desc = 'Maintain survival to harvest valuable SOULs.';
     if(type === 'MONSTER') desc = 'Consume SOULs to wager tokens in the Arena.';
 
